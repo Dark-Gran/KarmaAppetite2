@@ -9,6 +9,10 @@
 		"select_menu_scene_ascended": "Ghost_Pathfinder",
 
 		"back_spear": true,
-		"has_dreams": false
+		"the_mark": true,
+		"the_glow": true,
+		"has_dreams": false,
+		"world_state": [ "Rivulet", "Red" ],
+		"timeline_after": [ "Rivulet", "Red" ]
 	}
 }
