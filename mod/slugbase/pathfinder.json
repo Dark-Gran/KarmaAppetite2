@@ -7,5 +7,7 @@
 
 		"select_menu_scene": "Slugcat_Pathfinder",
 		"select_menu_scene_ascended": "Ghost_Pathfinder",
+
+		"back_spear":  true
 	}
 }

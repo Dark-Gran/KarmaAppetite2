@@ -54,7 +54,9 @@ namespace KarmaAppetite
         {
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit);
-            On.PlayerGraphics.DrawSprites += hook_DrawSprites;
+            On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
+            On.Spear.ChangeMode += hook_Spear_ChangeMode;
+            On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
         }
 
 
@@ -62,12 +64,11 @@ namespace KarmaAppetite
 
         //---VISUALS---
 
-        private void hook_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        //SAINT HAIR
+        private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
 
-            //Saint-like hair
-            
             int hair_num = 0;
 
             if (self.player.sleepCurlUp > 0f)
@@ -94,8 +95,50 @@ namespace KarmaAppetite
             }
 
             sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
-            
         }
 
+        //---SKILLS---
+
+        //SPEAR
+        private void hook_Spear_ChangeMode(On.Spear.orig_ChangeMode orig, Spear self, Weapon.Mode newMode)
+        {
+            orig.Invoke(self, newMode);
+
+            if (self.mode == Weapon.Mode.StuckInWall && newMode != Weapon.Mode.StuckInWall)
+            {
+                if (self.abstractSpear.stuckInWallCycles >= 0)
+                {
+                    for (int i = -1; i < 3; i++)
+                    {
+                        self.room.GetTile(self.stuckInWall.Value + new Vector2(20f * (float)i, 0f)).horizontalBeam = false;
+                    }
+                }
+                else
+                {
+                    for (int j = -1; j < 3; j++)
+                    {
+                        self.room.GetTile(self.stuckInWall.Value + new Vector2(0f, 20f * (float)j)).verticalBeam = false;
+                    }
+                }
+                self.stuckInWall = null;
+                self.abstractSpear.stuckInWallCycles = 0;
+                self.addPoles = false;
+            }            
+        }
+
+        private bool hook_Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
+        {
+            bool orig_result = orig.Invoke(self, obj);
+
+            if (obj is Spear && !orig_result)
+            {
+                if ((obj as Spear).mode == Weapon.Mode.Free || (obj as Spear).mode == Weapon.Mode.StuckInCreature || (obj as Spear).mode == Weapon.Mode.StuckInWall)
+                {
+                    return true;
+                }
+            }
+            
+            return orig_result;
+        }
     }
 }
