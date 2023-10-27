@@ -1,0 +1,10 @@
+﻿{
+	"id": "darkgran.karmaappetite",
+	"name": "Karma Appetite",
+	"version": "2.0",
+	"authors": "DarkGran",
+	"description": "...",
+	"requirements": [ "slime-cubed.slugbase" ],
+	"requirements_names": [ "SlugBase" ],
+	"tags": [ "Custom Slugcat", "Custom Region" ]
+}

@@ -1,0 +1,11 @@
+{
+	"id": "Pathfinder",
+	"name": "The Pathfinder",
+	"description": "...<LINE>...",
+	"features": {
+		"color": "ad521a",
+
+		"select_menu_scene": "Slugcat_Pathfinder",
+		"select_menu_scene_ascended": "Ghost_Pathfinder",
+	}
+}
