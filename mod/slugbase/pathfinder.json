@@ -10,18 +10,15 @@
 
 		"back_spear": true,
 		"the_mark": true,
+		"start_room":  "SU_A24",
 		"has_dreams": true,
 		"use_default_dreams": false,
 		"world_state": [ "Rivulet", "Red" ],
 		"timeline_after": [ "Rivulet", "Red" ],
 		"diet": {
-			"base": "Red",
 			"corpses": 1.0,
 			"meat": 0.5,
-			"plants": 0.5,
-			"overrides": {
-				"Fly": 0.5
-			}
+			"plants": 0.5
 		}
 	}
 }

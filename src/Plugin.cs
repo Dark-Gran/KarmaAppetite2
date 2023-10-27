@@ -59,11 +59,10 @@ namespace KarmaAppetite
 
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.Spear.ChangeMode += hook_Spear_ChangeMode;
-            On.Weapon.Grabbed += hook_Weapon_Grabbed;
             On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
+            On.Weapon.Grabbed += hook_Weapon_Grabbed;
             On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
             On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
-            On.Player.AddFood += hook_Player_AddFood;
             On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
         }
 
@@ -153,15 +152,11 @@ namespace KarmaAppetite
 
         private void hook_Weapon_Grabbed(On.Weapon.orig_Grabbed orig, Weapon self, Creature.Grasp grasp)
         {
-            orig.Invoke(self, grasp);
-
-            if (self.mode == Weapon.Mode.StuckInWall && grasp.grabber is Player)
+            if (grasp.grabber is Player && (grasp.grabbed as Weapon).mode == Weapon.Mode.StuckInWall)
             {
-                //if (((Player)grasp.grabber).Karma < STARTING_MAX_KARMA)
-                //{
-                    RemoveQuarterFood((Player)grasp.grabber);
-                //}
+                (grasp.grabber as Player).SubtractFood(1);
             }
+            orig.Invoke(self, grasp);
         }
 
         //---APPETITE---
@@ -280,7 +275,7 @@ namespace KarmaAppetite
             {
                 if (self.playerState.foodInStomach > 0)
                 {
-                    self.AddFood(-1);
+                    self.SubtractFood(1);
 
                     self.playerState.quarterFoodPoints += 3;
                     FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
@@ -290,20 +285,6 @@ namespace KarmaAppetite
             else
             {
                 self.playerState.quarterFoodPoints--;
-            }
-        }
-
-        private void hook_Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
-        {
-            int orig_add = add;
-            orig.Invoke(self, add);
-            if (orig_add < 0)
-            {
-                self.playerState.foodInStomach += orig_add;
-                if (self.abstractCreature.world.game.IsStorySession && self.AI == null)
-                {
-                    self.abstractCreature.world.game.GetStorySession.saveState.totFood += add;
-                }
             }
         }
 
