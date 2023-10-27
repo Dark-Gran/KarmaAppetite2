@@ -22,6 +22,7 @@ namespace KarmaAppetite
 
 
         //-------CONFIG MENU-------
+
         private OptionsMenu optionsMenuInstance;
         private bool initialized;
 
@@ -48,6 +49,7 @@ namespace KarmaAppetite
 
 
         //-------APPLY HOOKS-------
+
         private void LoadResources(RainWorld rainWorld) { }
 
         public void OnEnable()
@@ -60,17 +62,16 @@ namespace KarmaAppetite
         }
 
 
-        //-------IMPLEMENT HOOKS-------
+        //-------IMPLEMENTATION-------
 
         //---VISUALS---
 
-        //SAINT HAIR
         private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
 
+            //Saint-Hair
             int hair_num = 0;
-
             if (self.player.sleepCurlUp > 0f)
             {
                 hair_num = Custom.IntClamp((int)Mathf.Lerp((float)7, 4f, self.player.sleepCurlUp), 0, 8);
@@ -100,6 +101,7 @@ namespace KarmaAppetite
         //---SKILLS---
 
         //SPEAR
+
         private void hook_Spear_ChangeMode(On.Spear.orig_ChangeMode orig, Spear self, Weapon.Mode newMode)
         {
             orig.Invoke(self, newMode);
@@ -140,5 +142,136 @@ namespace KarmaAppetite
             
             return orig_result;
         }
+
+        //---APPETITE---
+
+        private const int STARTING_MAX_KARMA = 6;
+        private const int FOOD_POTENTIAL = 14; //Max food with max karma
+
+        //REFRESH
+
+        private void RefreshAllPlayers(StoryGameSession session)
+        {
+            foreach (AbstractCreature ac in session.Players)
+            {
+                if (ac.realizedCreature != null && ac.realizedCreature is Player)
+                {
+                    Player player = ac.realizedCreature as Player;
+                    KarmaToFood(player.slugcatStats, player.Karma);
+                    FoodToStats(player.slugcatStats, player.CurrentFood, player.Karma >= 9);
+                    RefreshGlow(player);
+                }
+            }
+        }
+
+        //SLUGCAT STATS
+
+        private void KarmaToFood(SlugcatStats self, int karma)
+        {
+            self.maxFood = GetFoodFromKarma(karma).x;
+            self.foodToHibernate = GetFoodFromKarma(karma).y;
+        }
+
+        private IntVector2 GetFoodFromKarma(int karma)
+        {
+            switch (karma + 1)
+            {
+                case 1:
+                default:
+                    return new IntVector2(3, 3);
+                case 2:
+                    return new IntVector2(4, 4);
+                case 3:
+                    return new IntVector2(5, 4);
+                case 4:
+                    return new IntVector2(6, 5);
+                case 5:
+                    return new IntVector2(7, 6);
+                case 6:
+                    return new IntVector2(9, 7);
+                case 7:
+                    return new IntVector2(10, 8);
+                case 8:
+                    return new IntVector2(11, 9);
+                case 9:
+                    return new IntVector2(12, 10);
+                case 10:
+                    return new IntVector2(FOOD_POTENTIAL, 11);
+            }
+        }
+
+        private void FoodToStats(SlugcatStats self, int food, bool extraStats)
+        {
+
+            if (!self.malnourished)
+            {
+                self.throwingSkill = (food > 0) ? 2 : 0;
+
+                float statBonus = food * ((extraStats) ? 0.08f : 0.04f);
+
+                const float STAT_BASE = 0.88f;
+                self.runspeedFac = STAT_BASE - 0.05f + statBonus;
+                self.poleClimbSpeedFac = STAT_BASE + statBonus;
+                self.corridorClimbSpeedFac = STAT_BASE + statBonus;
+                self.lungsFac = STAT_BASE + statBonus;
+
+                self.generalVisibilityBonus = 0f + statBonus / 10;
+                self.loudnessFac = 1.45f - statBonus / 2;
+                self.visualStealthInSneakMode = 0.11f + statBonus / 2;
+                self.bodyWeightFac -= statBonus / 2;
+            }
+            else
+            {
+                self.throwingSkill = 0;
+
+                self.loudnessFac = 1.4f;
+                self.generalVisibilityBonus = -0.1f;
+                self.visualStealthInSneakMode = 0.3f;
+            }
+
+        }
+
+        //FOOD
+
+        private void RemoveQuarterFood(Player self)
+        {
+            if (self.playerState.quarterFoodPoints <= 0)
+            {
+                if (self.playerState.foodInStomach > 0)
+                {
+                    self.AddFood(-1);
+                    self.playerState.quarterFoodPoints += 3;
+                    FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
+                    RefreshGlow(self);
+                }
+            }
+            else
+            {
+                self.playerState.quarterFoodPoints--;
+            }
+        }
+
+        //GLOW
+
+        private void RefreshGlow(Player self)
+        {
+            bool glowing = self.Karma + 1 > 4 && self.CurrentFood != 0;
+            if (self.glowing != glowing)
+            {
+                self.glowing = glowing;
+                if (!glowing && self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
+                {
+                    ((PlayerGraphics)self.graphicsModule).lightSource.Destroy();
+                }
+                if (self.room != null)
+                {
+                    if (self.room.game.session is StoryGameSession)
+                    {
+                        (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
+                    }
+                }
+            }
+        }
+
     }
 }

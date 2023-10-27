@@ -10,9 +10,15 @@
 
 		"back_spear": true,
 		"the_mark": true,
-		"the_glow": true,
-		"has_dreams": false,
+		"has_dreams": true,
+		"use_default_dreams": false,
 		"world_state": [ "Rivulet", "Red" ],
-		"timeline_after": [ "Rivulet", "Red" ]
+		"timeline_after": [ "Rivulet", "Red" ],
+		"diet": {
+			"base": "Red",
+			"corpses": 1.0,
+			"meat": 0.25,
+			"plants": 0.25
+		}
 	}
 }
