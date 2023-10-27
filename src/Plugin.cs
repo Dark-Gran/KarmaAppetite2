@@ -17,7 +17,7 @@ namespace KarmaAppetite
     [BepInPlugin(MOD_ID, "Karma Appetite", "2.0")]
     public class Plugin : BaseUnityPlugin
     {
-        
+
         private const string MOD_ID = "darkgran.karmaappetite";
 
 
@@ -55,13 +55,16 @@ namespace KarmaAppetite
         public void OnEnable()
         {
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-            On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu
-            
+            On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu (above)
+
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.Spear.ChangeMode += hook_Spear_ChangeMode;
+            On.Weapon.Grabbed += hook_Weapon_Grabbed;
             On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
             On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
             On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
+            On.Player.AddFood += hook_Player_AddFood;
+            On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
         }
 
 
@@ -128,7 +131,7 @@ namespace KarmaAppetite
                 self.stuckInWall = null;
                 self.abstractSpear.stuckInWallCycles = 0;
                 self.addPoles = false;
-            }            
+            }
         }
 
         private bool hook_Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
@@ -142,14 +145,29 @@ namespace KarmaAppetite
                     return true;
                 }
             }
-            
+
             return orig_result;
+        }
+
+        //SPEAR-PULL PRICE
+
+        private void hook_Weapon_Grabbed(On.Weapon.orig_Grabbed orig, Weapon self, Creature.Grasp grasp)
+        {
+            orig.Invoke(self, grasp);
+
+            if (self.mode == Weapon.Mode.StuckInWall && grasp.grabber is Player)
+            {
+                //if (((Player)grasp.grabber).Karma < STARTING_MAX_KARMA)
+                //{
+                    RemoveQuarterFood((Player)grasp.grabber);
+                //}
+            }
         }
 
         //---APPETITE---
 
         private const int STARTING_MAX_KARMA = 6;
-        private const int FOOD_POTENTIAL = 14; //Max food with max karma
+        private const int FOOD_POTENTIAL = 14; //max food with max karma
 
         //REFRESH
 
@@ -167,7 +185,7 @@ namespace KarmaAppetite
             }
         }
 
-        //SLUGCAT STATS
+        //KARMA -> FOOD -> STATS
 
         private static IntVector2 GetFoodFromKarma(int karma)
         {
@@ -234,7 +252,7 @@ namespace KarmaAppetite
 
         }
 
-        //FOOD
+        //FOOD METER
 
         private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
         {
@@ -254,6 +272,8 @@ namespace KarmaAppetite
             orig.Invoke(self, hud, maxFood, survivalLimit, associatedPup, pupNumber);
         }
 
+        //REMOVING FOOD POINTS
+
         private void RemoveQuarterFood(Player self)
         {
             if (self.playerState.quarterFoodPoints <= 0)
@@ -261,6 +281,7 @@ namespace KarmaAppetite
                 if (self.playerState.foodInStomach > 0)
                 {
                     self.AddFood(-1);
+
                     self.playerState.quarterFoodPoints += 3;
                     FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
                     RefreshGlow(self);
@@ -269,6 +290,35 @@ namespace KarmaAppetite
             else
             {
                 self.playerState.quarterFoodPoints--;
+            }
+        }
+
+        private void hook_Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
+        {
+            int orig_add = add;
+            orig.Invoke(self, add);
+            if (orig_add < 0)
+            {
+                self.playerState.foodInStomach += orig_add;
+                if (self.abstractCreature.world.game.IsStorySession && self.AI == null)
+                {
+                    self.abstractCreature.world.game.GetStorySession.saveState.totFood += add;
+                }
+            }
+        }
+
+        private void hook_QuarterPipShower_Update(On.HUD.FoodMeter.QuarterPipShower.orig_Update orig, HUD.FoodMeter.QuarterPipShower self)
+        {
+            orig.Invoke(self);
+            if (!self.owner.IsPupFoodMeter && (self.owner.hud.owner as Player).playerState.quarterFoodPoints < self.displayQuarterFood)
+            {
+                self.owner.visibleCounter = 80;
+                self.displayQuarterFood--;
+                self.lightUp = 1f;
+                if (self.owner.showCount < self.owner.circles.Count)
+                {
+                    self.owner.circles[self.owner.showCount].QuarterCirclePlop();
+                }
             }
         }
 
