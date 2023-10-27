@@ -55,10 +55,13 @@ namespace KarmaAppetite
         public void OnEnable()
         {
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-            On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit);
+            On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu
+            
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.Spear.ChangeMode += hook_Spear_ChangeMode;
             On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
+            On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
+            On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
         }
 
 
@@ -166,13 +169,7 @@ namespace KarmaAppetite
 
         //SLUGCAT STATS
 
-        private void KarmaToFood(SlugcatStats self, int karma)
-        {
-            self.maxFood = GetFoodFromKarma(karma).x;
-            self.foodToHibernate = GetFoodFromKarma(karma).y;
-        }
-
-        private IntVector2 GetFoodFromKarma(int karma)
+        private static IntVector2 GetFoodFromKarma(int karma)
         {
             switch (karma + 1)
             {
@@ -198,6 +195,12 @@ namespace KarmaAppetite
                 case 10:
                     return new IntVector2(FOOD_POTENTIAL, 11);
             }
+        }
+
+        private void KarmaToFood(SlugcatStats self, int karma)
+        {
+            self.maxFood = GetFoodFromKarma(karma).x;
+            self.foodToHibernate = GetFoodFromKarma(karma).y;
         }
 
         private void FoodToStats(SlugcatStats self, int food, bool extraStats)
@@ -232,6 +235,24 @@ namespace KarmaAppetite
         }
 
         //FOOD
+
+        private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
+        {
+            orig.Invoke(self, saveStateNumber, game);
+            KarmaToFood(self.characterStats, self.saveState.deathPersistentSaveData.karma);
+            FoodToStats(self.characterStats, self.saveState.food, self.saveState.deathPersistentSaveData.karma >= 9);
+        }
+
+        private void hook_FoodMeter_ctor(On.HUD.FoodMeter.orig_ctor orig, HUD.FoodMeter self, HUD.HUD hud, int maxFood, int survivalLimit, Player associatedPup = null, int pupNumber = 0)
+        {
+            if (hud.owner is Menu.SlugcatSelectMenu.SlugcatPageContinue)
+            {
+                IntVector2 fm = GetFoodFromKarma(((Menu.SlugcatSelectMenu.SlugcatPageContinue)hud.owner).saveGameData.karma);
+                maxFood = fm.x;
+                survivalLimit = fm.y;
+            }
+            orig.Invoke(self, hud, maxFood, survivalLimit, associatedPup, pupNumber);
+        }
 
         private void RemoveQuarterFood(Player self)
         {
