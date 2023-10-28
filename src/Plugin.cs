@@ -365,18 +365,9 @@ namespace KarmaAppetite
         private void hook_Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
         {
             orig.Invoke(self, add);
-            //CheckPipsOverMax(self);
             FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
             RefreshGlow(self);
         }
-
-        /*private void CheckPipsOverMax(Player self)
-        {
-            if (self.playerState.foodInStomach >= self.slugcatStats.maxFood && self.playerState.quarterFoodPoints > 0)
-            {
-                self.playerState.quarterFoodPoints -= self.playerState.quarterFoodPoints;
-            }
-        }*/
 
         //REMOVING FOOD POINTS
 
