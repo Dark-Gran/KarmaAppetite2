@@ -465,7 +465,7 @@ namespace KarmaAppetite
 
         private bool IsReadyToCraft(Player self)
         {
-            return (self.grasps[0] != null || self.grasps[1] != null) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 3.6f);
+            return self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
         }
 
         private bool CanAffordCraft(Player self, int craftPrice)
@@ -504,7 +504,19 @@ namespace KarmaAppetite
                     }
                 }
             }
-            if (physicalObject != null && physicalObject2 != null) //combining 2 objects
+            if (physicalObject == null && physicalObject2 == null) //empty-handed
+            {
+                if (CanAffordCraft(self, 1)) //"find debris"
+                {
+                    PhysicalObject newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
+                    if (newItem != null)
+                    {   
+                        self.SlugcatGrab(newItem, 0);
+                        success = true;
+                    }
+                }
+            }
+            else if (physicalObject != null && physicalObject2 != null) //combining 2 objects
             {
 
                 bool noDestruction = false;
