@@ -48,14 +48,40 @@ namespace KarmaAppetite
         }
 
 
+        //-------NEW ENUMS-------
+
+        public class KarmaAppetiteEnums
+        {
+            public class APOType
+            {
+                public static AbstractPhysicalObject.AbstractObjectType SpearShard; //For rocks made out of spear (see Crafting)
+
+                public static void RegisterValues()
+                {
+                    SpearShard = new AbstractPhysicalObject.AbstractObjectType("SpearShard", true);
+                }
+
+                public static void UnregisterValues()
+                {
+                    if (SpearShard != null) { SpearShard.Unregister(); SpearShard = null; }
+                }
+            }
+        }
+
+
         //-------APPLY HOOKS-------
 
-        private void LoadResources(RainWorld rainWorld) { }
+        
 
         public void OnEnable()
         {
+
+
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu (above)
+
+            //Enums
+            KarmaAppetiteEnums.APOType.RegisterValues();
 
             //KarmaAppetite
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
@@ -73,7 +99,16 @@ namespace KarmaAppetite
 
             //Crafting
             On.Player.Update += hook_Player_Update;
+            On.AbstractPhysicalObject.Realize += hook_AbstractPhysicalObject_Realize;
         }
+
+        public void OnDisable()
+        {
+            //Enums
+            KarmaAppetiteEnums.APOType.UnregisterValues();
+        }
+
+        private void LoadResources(RainWorld rainWorld) { }
 
 
         //-------IMPLEMENTATION-------
@@ -694,7 +729,11 @@ namespace KarmaAppetite
                         abstractPhysicalObject = new AbstractConsumable(room.world, spawningObject, null, spawnCoord, newID, -1, -1, null);
                     }
                 }
-                else if (spawningObject != AbstractPhysicalObject.AbstractObjectType.Spear)
+                else if (spawningObject == AbstractPhysicalObject.AbstractObjectType.Spear)
+                {
+                    abstractPhysicalObject = new AbstractSpear(room.world, null, spawnCoord, newID, spawnType == "explosive");
+                }
+                else
                 {
                     if (spawningObject == AbstractPhysicalObject.AbstractObjectType.SporePlant)
                     {
@@ -704,6 +743,10 @@ namespace KarmaAppetite
                     {
                         abstractPhysicalObject = new OverseerCarcass.AbstractOverseerCarcass(room.world, null, spawnCoord, room.game.GetNewID(), UnityEngine.Color.black, 0);
                     }
+                    else if (spawningObject == AbstractPhysicalObject.AbstractObjectType.Rock)
+                    {
+                        abstractPhysicalObject = new AbstractPhysicalObject(room.world, KarmaAppetiteEnums.APOType.SpearShard, null, spawnCoord, newID);
+                    }
                     else
                     {
                         abstractPhysicalObject = new AbstractPhysicalObject(room.world, spawningObject, null, spawnCoord, newID);
@@ -712,10 +755,6 @@ namespace KarmaAppetite
                             (abstractPhysicalObject as WaterNut.AbstractWaterNut).swollen = spawnType == "swollen";
                         }
                     }
-                }
-                else
-                {
-                    abstractPhysicalObject = new AbstractSpear(room.world, null, spawnCoord, newID, spawnType == "explosive");
                 }
                 try
                 {
@@ -728,6 +767,38 @@ namespace KarmaAppetite
                 realizedObject = abstractPhysicalObject.realizedObject;
             }
             return realizedObject;
+        }
+
+        //CRAFTED ROCKS (= SpearFragment visuals)
+
+        private void hook_AbstractPhysicalObject_Realize(On.AbstractPhysicalObject.orig_Realize orig, AbstractPhysicalObject self)
+        {
+            if (self.type == KarmaAppetiteEnums.APOType.SpearShard)
+            {
+                self.realizedObject = new SpearShard(self, self.world);
+            }
+            orig.Invoke(self);
+        }
+
+
+        public class SpearShard : Rock
+        {
+            public SpearShard(AbstractPhysicalObject abstractPhysicalObject, World world) : base(abstractPhysicalObject, world) { }
+
+            public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+            {
+                sLeaser.sprites = new FSprite[2];
+
+                sLeaser.sprites[0] = new FSprite("SpearFragment1", true);
+
+                TriangleMesh.Triangle[] tris = new TriangleMesh.Triangle[]
+                {
+                    new TriangleMesh.Triangle(0, 1, 2)
+                };
+                TriangleMesh triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
+                sLeaser.sprites[1] = triangleMesh;
+                this.AddToContainer(sLeaser, rCam, null);
+            }
         }
 
         //CRAFTING ANIMATION
