@@ -585,7 +585,7 @@ namespace KarmaAppetite
                         PayDay(self, 4);
                         break;
                     }
-                    if (((physicalObject is SSOracleSwarmer && physicalObject2 is SSOracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordCraft(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
+                    if (self.Karma >= 9 && ((physicalObject is SSOracleSwarmer && physicalObject2 is SSOracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordCraft(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
                     {
                         newItem = SpawnObject(self, MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
