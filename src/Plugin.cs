@@ -60,7 +60,6 @@ namespace KarmaAppetite
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.Spear.ChangeMode += hook_Spear_ChangeMode;
             On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
-            On.Weapon.Grabbed += hook_Weapon_Grabbed;
             On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
             On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
             On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
@@ -109,8 +108,6 @@ namespace KarmaAppetite
 
         private void hook_Spear_ChangeMode(On.Spear.orig_ChangeMode orig, Spear self, Weapon.Mode newMode)
         {
-            orig.Invoke(self, newMode);
-
             if (self.mode == Weapon.Mode.StuckInWall && newMode != Weapon.Mode.StuckInWall)
             {
                 if (self.abstractSpear.stuckInWallCycles >= 0)
@@ -131,37 +128,27 @@ namespace KarmaAppetite
                 self.abstractSpear.stuckInWallCycles = 0;
                 self.addPoles = false;
             }
+
+            orig.Invoke(self, newMode);
+
         }
 
         private bool hook_Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
         {
             bool orig_result = orig.Invoke(self, obj);
 
-            if (obj is Spear && !orig_result)
+            if (!orig_result && obj is Spear && (obj as Spear).mode == Weapon.Mode.StuckInWall)
             {
-                if ((obj as Spear).mode == Weapon.Mode.Free || (obj as Spear).mode == Weapon.Mode.StuckInCreature || (obj as Spear).mode == Weapon.Mode.StuckInWall)
-                {
-                    return true;
-                }
+                return self.FoodInStomach >= DISLODGE_FOOD;
             }
 
             return orig_result;
         }
 
-        //SPEAR-PULL PRICE
-
-        private void hook_Weapon_Grabbed(On.Weapon.orig_Grabbed orig, Weapon self, Creature.Grasp grasp)
-        {
-            if (grasp.grabber is Player && (grasp.grabbed as Weapon).mode == Weapon.Mode.StuckInWall)
-            {
-                (grasp.grabber as Player).SubtractFood(1);
-            }
-            orig.Invoke(self, grasp);
-        }
-
         //---APPETITE---
 
         private const int STARTING_MAX_KARMA = 6;
+        private const int DISLODGE_FOOD = 1; //food in stomach for dislodge
         private const int FOOD_POTENTIAL = 14; //max food with max karma
 
         //REFRESH
