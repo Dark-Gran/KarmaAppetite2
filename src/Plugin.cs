@@ -75,8 +75,6 @@ namespace KarmaAppetite
 
         public void OnEnable()
         {
-
-
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu (above)
 
@@ -657,8 +655,8 @@ namespace KarmaAppetite
                 PhysicalObject objectPartB = null;
                 if (physicalObject is Spear) // Spear => 2 Rocks
                 {
-                    objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
-                    objectPartB = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
+                    objectPartA = SpawnObject(self, KarmaAppetiteEnums.APOType.SpearShard, room, self.abstractCreature.pos, "");
+                    objectPartB = SpawnObject(self, KarmaAppetiteEnums.APOType.SpearShard, room, self.abstractCreature.pos, "");
                 }
                 else if (physicalObject is ExplosiveSpear) //Explosive Spear => Spear + Bomb
                 {
@@ -742,10 +740,6 @@ namespace KarmaAppetite
                     else if (spawningObject == AbstractPhysicalObject.AbstractObjectType.OverseerCarcass)
                     {
                         abstractPhysicalObject = new OverseerCarcass.AbstractOverseerCarcass(room.world, null, spawnCoord, room.game.GetNewID(), UnityEngine.Color.black, 0);
-                    }
-                    else if (spawningObject == AbstractPhysicalObject.AbstractObjectType.Rock)
-                    {
-                        abstractPhysicalObject = new AbstractPhysicalObject(room.world, KarmaAppetiteEnums.APOType.SpearShard, null, spawnCoord, newID);
                     }
                     else
                     {
