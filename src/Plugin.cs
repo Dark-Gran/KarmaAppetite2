@@ -60,6 +60,7 @@ namespace KarmaAppetite
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
             On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
+            On.SLOracleSwarmer.BitByPlayer += hook_SLOracleSwarmer_BitByPlayer;
             On.Spear.ChangeMode += hook_Spear_ChangeMode;
             On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
             On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
@@ -143,6 +144,13 @@ namespace KarmaAppetite
             orig.Invoke(self, grasp, eu);
             RefreshGlow(grasp.grabber as Player);
         }
+
+        private void hook_SLOracleSwarmer_BitByPlayer(On.SLOracleSwarmer.orig_BitByPlayer orig, SLOracleSwarmer self, Creature.Grasp grasp, bool eu)
+        {
+            orig.Invoke(self, grasp, eu);
+            RefreshGlow(grasp.grabber as Player);
+        }
+
 
         //---SKILLS---
 
