@@ -184,7 +184,7 @@ namespace KarmaAppetite
                             sLeaser.sprites[i].isVisible = true;
                             sLeaser.sprites[i].x = self.head.pos.x - camPos.x;
                             sLeaser.sprites[i].y = self.head.pos.y - camPos.y;
-                            sLeaser.sprites[i].scale = 9f;
+                            sLeaser.sprites[i].scale = TUNNEL_MARK_SIZE;
                         }
                     }
                     else if ((i < 4 || i > 8) && i != 12 && i != 13 && i < 15)
@@ -479,7 +479,7 @@ namespace KarmaAppetite
 
         //CRAFTING BASICS
 
-        private static int CRAFTING_TIME = 140;
+        private const int CRAFTING_TIME = 140;
         private int CraftingCounter = 0;
         private bool CraftingLock = false;
         private int LockCounter = 0;
@@ -912,9 +912,10 @@ namespace KarmaAppetite
 
         //---TUNNELING / PATHFINDING---
 
-        private static int TUNNELING_TIME = 180;
-        private static int TUNNELING_PRICE = 0;
-        private static int TUNNELING_DISTANCE = 10;
+        private const int TUNNELING_TIME = 180;
+        private const int TUNNELING_PRICE = 0;
+        private const int TUNNELING_DISTANCE = 10;
+        private const float TUNNEL_MARK_SIZE = 7f;
         private int TunnelingCounter = 0;
         private bool TunnelingLock = false;
         private int TunnelingLockCounter = 0;
@@ -970,13 +971,15 @@ namespace KarmaAppetite
         private void StartTunnel(Player self, bool eu)
         {
 
+            IntVector2 direction = new IntVector2(TUNNELING_DISTANCE, 0);
+
+
             IsInTunnel = true;
             IntVector2 startPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
-            TunnelDestination = new IntVector2(startPos.x+TUNNELING_DISTANCE, startPos.y);
+            TunnelDestination = startPos + direction;
             self.inShortcut = true;
             self.abstractCreature.pos.Tile = TunnelDestination;
             self.enteringShortCut = TunnelDestination;
-
 
         }
 
