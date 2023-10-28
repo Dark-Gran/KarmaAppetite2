@@ -82,6 +82,7 @@ namespace KarmaAppetite
             KarmaAppetiteEnums.APOType.RegisterValues();
 
             //KarmaAppetite
+            On.Player.Update += hook_Player_Update;
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
             On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
@@ -96,7 +97,6 @@ namespace KarmaAppetite
             On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
 
             //Crafting
-            On.Player.Update += hook_Player_Update;
             On.AbstractPhysicalObject.Realize += hook_AbstractPhysicalObject_Realize;
         }
 
@@ -197,6 +197,21 @@ namespace KarmaAppetite
 
 
         //---SKILLS---
+
+        private void hook_Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            CheckForCrafting(self, eu); //See below Appetite            
+            CheckForTunneling(self, eu); //See below Crafting
+
+        }
+
+        private bool CanAffordPrice(Player self, int price, bool never_free=false)
+        {
+            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || (self.Karma >= STARTING_MAX_KARMA && !never_free);
+        }
+
 
         //SPEAR PULL
 
@@ -416,10 +431,8 @@ namespace KarmaAppetite
         private int LockCounter = 0;
         private bool LookAtPrimary = true;
 
-        private void hook_Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        private void CheckForCrafting(Player self, bool eu) //called by hook_Player_Update
         {
-            orig.Invoke(self, eu);
-
             if (Input.GetKey(KeyCode.Q) && IsReadyToCraft(self) && !CraftingLock)
             {
                 CraftingCounter++;
@@ -459,11 +472,6 @@ namespace KarmaAppetite
             return self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
         }
 
-        private bool CanAffordCraft(Player self, int craftPrice)
-        {
-            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= STARTING_MAX_KARMA;
-        }
-
         private void PayDay(Player self, int quarterPrice)
         {
             if (self.Karma < STARTING_MAX_KARMA)
@@ -497,7 +505,7 @@ namespace KarmaAppetite
             }
             if (physicalObject == null && physicalObject2 == null) //empty-handed
             {
-                if (CanAffordCraft(self, 1)) //"find debris"
+                if (CanAffordPrice(self, 1)) //"find debris"
                 {
                     PhysicalObject newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
                     PayDay(self, 1);
@@ -516,25 +524,25 @@ namespace KarmaAppetite
 
                 for (int j = 0; j < 2; j++)
                 {
-                    if (physicalObject is Spear && physicalObject2 is ScavengerBomb && CanAffordCraft(self, 1)) //Spear + Bomb = Explosive Spear
+                    if (physicalObject is Spear && physicalObject2 is ScavengerBomb && CanAffordPrice(self, 1)) //Spear + Bomb = Explosive Spear
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "explosive");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordCraft(self, 1)) //Rock + Rock = Spear
+                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordPrice(self, 1)) //Rock + Rock = Spear
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordCraft(self, 2)) //Firecracker + Waternut/Rock = Bomb
+                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordPrice(self, 2)) //Firecracker + Waternut/Rock = Bomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 2);
                         break;
                     }
-                    if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordCraft(self, 1)) //Firecracker + Firecracker = Beebomb
+                    if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordPrice(self, 1)) //Firecracker + Firecracker = Beebomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SporePlant, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
@@ -545,38 +553,38 @@ namespace KarmaAppetite
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Lantern, room, self.abstractCreature.pos, "");
                         break;
                     }
-                    if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordCraft(self, 1)) //VultureWorm + Dangle = GrappleWorm
+                    if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordPrice(self, 1)) //VultureWorm + Dangle = GrappleWorm
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Creature, room, self.abstractCreature.pos, "Tube Worm");
                         PayDay(self, 1);
                         break;
                     }
-                    if ((physicalObject is JellyFish && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut)) && CanAffordCraft(self, 1)) //Jellyfish + Dangle/Waternut = Flashbang
+                    if ((physicalObject is JellyFish && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut)) && CanAffordPrice(self, 1)) //Jellyfish + Dangle/Waternut = Flashbang
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FlareBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is Mushroom && physicalObject2 is Mushroom && CanAffordCraft(self, 1)) //Mushroom + Mushroom = Gasbomb
+                    if (physicalObject is Mushroom && physicalObject2 is Mushroom && CanAffordPrice(self, 1)) //Mushroom + Mushroom = Gasbomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.PuffBall, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is DataPearl && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2)) //Pearl + Overseer = Neuron
+                    if (physicalObject is DataPearl && physicalObject2 is OverseerCarcass && CanAffordPrice(self, 2)) //Pearl + Overseer = Neuron
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SSOracleSwarmer, room, self.abstractCreature.pos, "");
                         (newItem as OracleSwarmer).affectedByGravity = 0f;
                         PayDay(self, 4);
                         break;
                     }
-                    if (physicalObject is Mushroom && physicalObject2 is FlyLure && CanAffordCraft(self, 4)) //Mushroom + Flylure = KarmaFlower
+                    if (physicalObject is Mushroom && physicalObject2 is FlyLure && CanAffordPrice(self, 4)) //Mushroom + Flylure = KarmaFlower
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.KarmaFlower, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
                         break;
                     }
-                    if (self.Karma >= 9 && ((physicalObject is SSOracleSwarmer && physicalObject2 is SSOracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordCraft(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
+                    if (self.Karma >= 9 && ((physicalObject is SSOracleSwarmer && physicalObject2 is SSOracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordPrice(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
                     {
                         newItem = SpawnObject(self, MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
@@ -590,7 +598,7 @@ namespace KarmaAppetite
                         noDestruction = true;
                         break;
                     }
-                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2)) //Overseer + Overseer = Firecracker
+                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordPrice(self, 2)) //Overseer + Overseer = Firecracker
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
                         PayDay(self, 2);
@@ -846,5 +854,74 @@ namespace KarmaAppetite
                 pg.blink = 50;
             }
         }
+
+
+        //---TUNNELING / PATHFINDING---
+
+        private static int TUNNELING_TIME = 140;
+        private static int TUNNELING_PRICE = 0;
+        private int TunnelingCounter = 0;
+        private bool TunnelingLock = false;
+        private int TunnelingLockCounter = 0;
+        private bool IsInTunnel = false;
+
+        private void CheckForTunneling(Player self, bool eu) //called by hook_Player_Update
+        {
+            if (Input.GetKey(KeyCode.E) && CanTunnel(self) && !TunnelingLock && !IsInTunnel)
+            {
+                TunnelingCounter++;
+                if (TunnelingCounter > TUNNELING_TIME)
+                {
+                    TunnelingLock = true;
+                    StartTunnel(self, eu);
+                    TunnelingCounter = 0;
+                }
+                else
+                {
+                    AnimateTunneling(self);
+                }
+            }
+            else if (TunnelingCounter > 0)
+            {
+                TunnelingCounter = 0;
+                LookAtPrimary = true;
+            }
+            if (TunnelingLock)
+            {
+                TunnelingLockCounter++;
+                if (TunnelingLockCounter == 80)
+                {
+                    TunnelingLock = false;
+                    TunnelingLockCounter = 0;
+                }
+            }
+        }
+
+        private bool CanTunnel(Player self)
+        {
+            return CanAffordPrice(self, TUNNELING_PRICE) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
+        }
+
+        private void StartTunnel(Player self, bool eu)
+        {
+            //todo
+        }
+
+        //TUNNELING ANIMATIONS
+
+        private void AnimateTunneling(Player self) //Pathfinding animation
+        {
+            if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
+            {
+                PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
+                if (TunnelingCounter % 50 == 0)
+                {
+                    pg.blink = 25;
+                }
+                pg.objectLooker.currentMostInteresting = self;
+                pg.head.vel += Custom.DirVec(pg.drawPositions[0, 0], pg.objectLooker.mostInterestingLookPoint);
+            }
+        }
+
     }
 }
