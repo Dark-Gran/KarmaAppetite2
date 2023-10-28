@@ -273,7 +273,7 @@ namespace KarmaAppetite
                 self.lungsFac = STAT_BASE + statBonus;
 
                 self.generalVisibilityBonus = 0f + statBonus / 10;
-                self.loudnessFac = 1.45f - statBonus / 2;
+                self.loudnessFac = 1.43f - statBonus / 2;
                 self.visualStealthInSneakMode = 0.11f + statBonus / 2;
                 self.bodyWeightFac -= statBonus / 2;
             }
@@ -281,7 +281,7 @@ namespace KarmaAppetite
             {
                 self.throwingSkill = 0;
 
-                self.loudnessFac = 1.4f;
+                self.loudnessFac = 1.38f;
                 self.generalVisibilityBonus = -0.1f;
                 self.visualStealthInSneakMode = 0.3f;
             }
