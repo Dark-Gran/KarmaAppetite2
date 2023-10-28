@@ -58,6 +58,7 @@ namespace KarmaAppetite
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu (above)
 
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
+            On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
             On.Spear.ChangeMode += hook_Spear_ChangeMode;
             On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
             On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
@@ -100,6 +101,40 @@ namespace KarmaAppetite
             }
 
             sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
+        }
+
+        private void RefreshGlow(Player self)
+        {
+            bool glowing = self.Karma + 1 > 4 && self.CurrentFood != 0;
+            if (self.glowing != glowing)
+            {
+                self.glowing = glowing;
+                if (!glowing && self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
+                {
+                    ((PlayerGraphics)self.graphicsModule).lightSource.Destroy();
+                }
+                if (self.room != null)
+                {
+                    if (self.room.game.session is StoryGameSession)
+                    {
+                        (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
+                    }
+                }
+            }
+        }
+
+        private void hook_LightSource_ApplyPalette(On.LightSource.orig_ApplyPalette orig, LightSource self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+            orig.Invoke(self, sLeaser, rCam, palette);
+
+            if (self.tiedToObject is Player)
+            {
+                if (SlugBase.Features.PlayerFeatures.SlugcatColor.TryGet((self.tiedToObject as Player), out var c))
+                {
+                    self.color = c;
+                }
+                
+            }
         }
 
         //---SKILLS---
@@ -286,28 +321,6 @@ namespace KarmaAppetite
                 if (self.owner.showCount < self.owner.circles.Count)
                 {
                     self.owner.circles[self.owner.showCount].QuarterCirclePlop();
-                }
-            }
-        }
-
-        //GLOW
-
-        private void RefreshGlow(Player self)
-        {
-            bool glowing = self.Karma + 1 > 4 && self.CurrentFood != 0;
-            if (self.glowing != glowing)
-            {
-                self.glowing = glowing;
-                if (!glowing && self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
-                {
-                    ((PlayerGraphics)self.graphicsModule).lightSource.Destroy();
-                }
-                if (self.room != null)
-                {
-                    if (self.room.game.session is StoryGameSession)
-                    {
-                        (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
-                    }
                 }
             }
         }
