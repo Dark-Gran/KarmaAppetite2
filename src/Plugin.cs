@@ -971,12 +971,25 @@ namespace KarmaAppetite
         private void StartTunnel(Player self, bool eu)
         {
 
-            IntVector2 direction = new IntVector2(TUNNELING_DISTANCE, 0);
+            IntVector2 direction = new IntVector2(-1, 0);
+            if (self.input[0].y == 0) //right and left
+            {
+                if (self.mainBodyChunk.pos.x-self.mainBodyChunk.lastPos.x < 0)
+                {
+                    direction.x = 1;
+                }
+            }
+            else //up and down
+            {
+
+            }
 
 
-            IsInTunnel = true;
+            direction *= TUNNELING_DISTANCE;
             IntVector2 startPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
             TunnelDestination = startPos + direction;
+            
+            IsInTunnel = true;
             self.inShortcut = true;
             self.abstractCreature.pos.Tile = TunnelDestination;
             self.enteringShortCut = TunnelDestination;
