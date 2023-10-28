@@ -18,7 +18,10 @@
 		"diet": {
 			"corpses": 1.0,
 			"meat": 0.5,
-			"plants": 0.5
+			"plants": 0.5,
+			"overrides": {
+				"KarmaFlower": 1.0
+			}
 		}
 	}
 }

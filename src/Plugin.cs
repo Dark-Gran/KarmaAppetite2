@@ -63,13 +63,20 @@ namespace KarmaAppetite
             On.SLOracleSwarmer.BitByPlayer += hook_SLOracleSwarmer_BitByPlayer;
             On.Spear.ChangeMode += hook_Spear_ChangeMode;
             On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
+            On.Player.ThrownSpear += hook_Player_ThrownSpear;
             On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
             On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
+            On.Player.SetMalnourished += hook_Player_SetMalnourished;
+            On.Player.AddFood += hook_Player_AddFood;
             On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
         }
 
 
         //-------IMPLEMENTATION-------
+
+        private const int STARTING_MAX_KARMA = 6;
+        private const int DISLODGE_FOOD = 1; //food in stomach for dislodge
+        private const int FOOD_POTENTIAL = 14; //max food with max karma
 
         //---VISUALS---
 
@@ -154,7 +161,7 @@ namespace KarmaAppetite
 
         //---SKILLS---
 
-        //SPEAR
+        //SPEAR PULL
 
         private void hook_Spear_ChangeMode(On.Spear.orig_ChangeMode orig, Spear self, Weapon.Mode newMode)
         {
@@ -197,9 +204,6 @@ namespace KarmaAppetite
 
         //---APPETITE---
 
-        private const int STARTING_MAX_KARMA = 6;
-        private const int DISLODGE_FOOD = 1; //food in stomach for dislodge
-        private const int FOOD_POTENTIAL = 14; //max food with max karma
 
         //REFRESH
 
@@ -217,7 +221,7 @@ namespace KarmaAppetite
             }
         }
 
-        //KARMA -> FOOD -> STATS
+        //KARMA -> FOOD -> STATS (incl. spear-throwing)
 
         private static IntVector2 GetFoodFromKarma(int karma)
         {
@@ -284,6 +288,16 @@ namespace KarmaAppetite
 
         }
 
+        private static void hook_Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player self, Spear spear)
+        {
+            orig.Invoke(self, spear);
+            spear.spearDamageBonus = 0.25f + ((self.playerState.foodInStomach / (FOOD_POTENTIAL / 10)) * ((self.Karma >= 9) ? 1f : 0.5f));
+            BodyChunk firstChunk2 = spear.firstChunk;
+            float speedBoost = 0.73f + (self.playerState.foodInStomach / 10);
+            if (speedBoost < 1f && self.playerState.foodInStomach > 0) { speedBoost = 1f; }
+            firstChunk2.vel.x = firstChunk2.vel.x * speedBoost;
+        }
+
         //FOOD METER
 
         private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
@@ -303,6 +317,29 @@ namespace KarmaAppetite
             }
             orig.Invoke(self, hud, maxFood, survivalLimit, associatedPup, pupNumber);
         }
+
+        private void hook_Player_SetMalnourished(On.Player.orig_SetMalnourished orig, Player self, bool m)
+        {
+            orig.Invoke(self, m);
+            KarmaToFood(self.slugcatStats, self.Karma);
+            FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
+        }
+
+        private void hook_Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
+        {
+            orig.Invoke(self, add);
+            //CheckPipsOverMax(self);
+            FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
+            RefreshGlow(self);
+        }
+
+        /*private static void CheckPipsOverMax(Player self)
+        {
+            if (self.playerState.foodInStomach >= self.slugcatStats.maxFood && self.playerState.quarterFoodPoints > 0)
+            {
+                self.playerState.quarterFoodPoints -= self.playerState.quarterFoodPoints;
+            }
+        }*/
 
         //REMOVING FOOD POINTS
 
