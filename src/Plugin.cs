@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Drawing;
+using System.Collections.Generic;
 using BepInEx;
+using MonoMod.RuntimeDetour;
+using MonoMod;
 using On;
 using IL;
 using RWCustom;
 using UnityEngine;
 using SlugBase.Features;
-using static SlugBase.Features.FeatureTypes;
-using MonoMod.RuntimeDetour;
-using System.Drawing;
 using MoreSlugcats;
-using MonoMod;
 
 namespace KarmaAppetite
 {
@@ -288,7 +288,7 @@ namespace KarmaAppetite
 
         }
 
-        private static void hook_Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player self, Spear spear)
+        private void hook_Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player self, Spear spear)
         {
             orig.Invoke(self, spear);
             spear.spearDamageBonus = 0.25f + ((self.playerState.foodInStomach / (FOOD_POTENTIAL / 10)) * ((self.Karma >= 9) ? 1f : 0.5f));
@@ -333,7 +333,7 @@ namespace KarmaAppetite
             RefreshGlow(self);
         }
 
-        /*private static void CheckPipsOverMax(Player self)
+        /*private void CheckPipsOverMax(Player self)
         {
             if (self.playerState.foodInStomach >= self.slugcatStats.maxFood && self.playerState.quarterFoodPoints > 0)
             {
@@ -377,5 +377,453 @@ namespace KarmaAppetite
             }
         }
 
+
+        //---CRAFTING---
+
+
+        private int CraftingCounter = 0;
+        private bool CraftingLock = false;
+        private int LockCounter = 0;
+        private bool LookAtPrimary = true;
+        private List<AbstractPhysicalObject> CraftedRocks; //specific visuals retained only until session end
+
+        private void hook_Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            if (Input.GetKey(KeyCode.Q) && IsReadyToCraft(self) && !CraftingLock)
+            {
+                CraftingCounter++;
+                if (CraftingCounter > 200)
+                {
+                    CraftingLock = true;
+                    Craft(self, eu);
+                    CraftingCounter = 0;
+                }
+                else
+                {
+                    AnimateCraft(self);
+                }
+            }
+            else if (CraftingCounter > 0)
+            {
+                CraftingCounter = 0;
+                LookAtPrimary = true;
+            }
+            if (CraftingLock)
+            {
+                LockCounter++;
+                if (LockCounter == 80)
+                {
+                    CraftingLock = false;
+                    LockCounter = 0;
+                }
+            }
+            else
+            {
+                LockCounter = 0;
+            }
+        }
+
+        private bool IsReadyToCraft(Player self)
+        {
+            return (self.grasps[0] != null || self.grasps[1] != null) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 3.6f);
+        }
+
+        public bool CanAffordCraft(Player self, int craftPrice) //For future split: This and PayDay are the only methods using KarmaAppetite
+        {
+            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= KarmaAppetite.STARTING_MAX_KARMA;
+        }
+
+        public void PayDay(Player self, int quarterPrice)
+        {
+            if (self.Karma < KarmaAppetite.STARTING_MAX_KARMA)
+            {
+                for (int i = 0; i < quarterPrice; i++)
+                {
+                    KarmaAppetite.RemoveQuarterFood(self); //For future split: KarmaAppetite is the one making sure all Players have quarterFood initialized
+                }
+            }
+        }
+
+        public void Craft(Player self, bool eu)
+        {
+            bool success = false;
+            Room room = self.room;
+            PhysicalObject physicalObject = null;
+            PhysicalObject physicalObject2 = null;
+            for (int i = 0; i < self.grasps.Length; i++)
+            {
+                if (self.grasps[i] != null)
+                {
+                    if (i == 0)
+                    {
+                        physicalObject = self.grasps[i].grabbed;
+                    }
+                    if (i == 1)
+                    {
+                        physicalObject2 = self.grasps[i].grabbed;
+                    }
+                }
+            }
+            if (physicalObject != null && physicalObject2 != null) //2 objects
+            {
+
+                bool noDestruction = false;
+                PhysicalObject newItem = null;
+
+                for (int j = 0; j < 2; j++)
+                {
+                    if (physicalObject is Spear && physicalObject2 is ScavengerBomb && CanAffordCraft(self, 1))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "explosive");
+                        PayDay(self, 1);
+                        break;
+                    }
+                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordCraft(self, 2))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "");
+                        PayDay(self, 2);
+                        break;
+                    }
+                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordCraft(self, 3))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, room, self.abstractCreature.pos, "");
+                        PayDay(self, 3);
+                        break;
+                    }
+                    if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordCraft(self, 1))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SporePlant, room, self.abstractCreature.pos, "");
+                        PayDay(self, 1);
+                        break;
+                    }
+                    if (physicalObject is SlimeMold && physicalObject2 is DangleFruit && CanAffordCraft(self, 1))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Lantern, room, self.abstractCreature.pos, "");
+                        PayDay(self, 1);
+                        break;
+                    }
+                    if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordCraft(self, 1))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Creature, room, self.abstractCreature.pos, "Tube Worm");
+                        PayDay(self, 1);
+                        break;
+                    }
+                    if ((physicalObject is JellyFish && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut)) && CanAffordCraft(self, 1))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FlareBomb, room, self.abstractCreature.pos, "");
+                        PayDay(self, 1);
+                        break;
+                    }
+                    if (physicalObject is Mushroom && physicalObject2 is Mushroom && CanAffordCraft(self, 1))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.PuffBall, room, self.abstractCreature.pos, "");
+                        PayDay(self, 1);
+                        break;
+                    }
+                    if (physicalObject is DataPearl && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SSOracleSwarmer, room, self.abstractCreature.pos, "");
+                        (newItem as OracleSwarmer).affectedByGravity = 0f;
+                        PayDay(self, 4);
+                        break;
+                    }
+                    if (physicalObject is Mushroom && physicalObject2 is FlyLure && CanAffordCraft(self, 4))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.KarmaFlower, room, self.abstractCreature.pos, "");
+                        PayDay(self, 4);
+                        break;
+                    }
+                    if (physicalObject is Creature && (physicalObject2 is Rock || physicalObject2 is Spear))
+                    {
+                        if (!(physicalObject as Creature).dead)
+                        {
+                            (physicalObject as Creature).dead = true;
+                            CreatureState state = (physicalObject as Creature).State;
+                            if (state != null)
+                            {
+                                if (state is HealthState)
+                                {
+                                    (state as HealthState).alive = false;
+                                }
+                            }
+                            room.PlaySound(SoundID.Spear_Stick_In_Creature, self.mainBodyChunk.pos);
+                            noDestruction = true;
+                        }
+                        break;
+                    }
+                    if (physicalObject is Creature && physicalObject2 is JellyFish)
+                    {
+                        if ((physicalObject as Creature).dead && !((physicalObject as Creature).State.meatLeft < (physicalObject as Creature).abstractCreature.creatureTemplate.meatPoints))
+                        {
+                            (physicalObject as Creature).dead = false;
+                            CreatureState state2 = (physicalObject as Creature).State;
+                            if (state2 != null)
+                            {
+                                if (state2 is HealthState)
+                                {
+                                    (state2 as HealthState).health = 1f;
+                                    (state2 as HealthState).alive = true;
+                                }
+                            }
+                            room.PlaySound(SoundID.Jelly_Fish_Tentacle_Stun, self.mainBodyChunk.pos);
+                            noDestruction = true;
+                        }
+                        break;
+                    }
+                    //Alternative route to explosives
+                    if (physicalObject is SSOracleSwarmer && physicalObject2 is Rock)
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.OverseerCarcass, room, self.abstractCreature.pos, "");
+                        physicalObject.Destroy();
+                        noDestruction = true;
+                        break;
+                    }
+                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 4))
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
+                        PayDay(self, 4);
+                        break;
+                    }
+
+                    PhysicalObject physicalObject13 = physicalObject;
+                    physicalObject = physicalObject2;
+                    physicalObject2 = physicalObject13;
+                }
+                //finish
+                if (newItem != null || noDestruction)
+                {
+                    if (!noDestruction)
+                    {
+                        if (IsCraftedRock(physicalObject.abstractPhysicalObject))
+                        {
+                            RemoveCraftedRock(physicalObject.abstractPhysicalObject);
+                        }
+                        physicalObject.Destroy();
+                        if (IsCraftedRock(physicalObject2.abstractPhysicalObject))
+                        {
+                            RemoveCraftedRock(physicalObject2.abstractPhysicalObject);
+                        }
+                        physicalObject2.Destroy();
+                    }
+                    if (!(newItem is OracleSwarmer))
+                    {
+                        self.SlugcatGrab(newItem, 0);
+                    }
+                    success = true;
+                }
+            }
+            else if (physicalObject != null || physicalObject2 != null) //Only 1 object (mostly reverse-engineering)
+            {
+                if (physicalObject2 != null)
+                {
+                    physicalObject = physicalObject2;
+                }
+                PhysicalObject objectPartA = null;
+                PhysicalObject objectPartB = null;
+                if (physicalObject is Spear)
+                {
+                    objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
+                    objectPartB = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
+                }
+                else if (physicalObject is ExplosiveSpear)
+                {
+                    objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "");
+                    objectPartB = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, room, self.abstractCreature.pos, "");
+                }
+                else if (physicalObject is ScavengerBomb)
+                {
+                    objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
+                }
+                else if (physicalObject is Lantern)
+                {
+                    objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SlimeMold, room, self.abstractCreature.pos, "");
+                }
+                else if (physicalObject is TubeWorm)
+                {
+                    objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Creature, room, self.abstractCreature.pos, "Vulture Grub");
+                }
+                else if (physicalObject is FlareBomb)
+                {
+                    objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.WaterNut, room, self.abstractCreature.pos, "swollen");
+                }
+                if (objectPartA != null || objectPartB != null)
+                {
+                    physicalObject.Destroy();
+                    if (objectPartA != null)
+                    {
+                        self.SlugcatGrab(objectPartA, 0);
+                    }
+                    if (objectPartB != null)
+                    {
+                        self.SlugcatGrab(objectPartB, 1);
+                    }
+                    success = true;
+                }
+            }
+            if (success)
+            {
+                AnimateSuccess(self);
+            }
+
+        }
+
+        public PhysicalObject SpawnObject(Player crafter, AbstractPhysicalObject.AbstractObjectType spawningObject, Room room, WorldCoordinate spawnCoord, string spawnType = "")
+        {
+            EntityID newID = room.game.GetNewID();
+            PhysicalObject realizedObject;
+            if (spawningObject == 0)
+            {
+                AbstractCreature abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(spawnType), null, spawnCoord, newID);
+                abstractCreature.RealizeInRoom();
+                realizedObject = abstractCreature.realizedObject;
+            }
+            else
+            {
+                AbstractPhysicalObject abstractPhysicalObject;
+                if (AbstractConsumable.IsTypeConsumable(spawningObject))
+                {
+                    if (spawningObject == AbstractPhysicalObject.AbstractObjectType.DataPearl)
+                    {
+                        abstractPhysicalObject = new DataPearl.AbstractDataPearl(room.world, spawningObject, null, spawnCoord, newID, -1, -1, null, 0);
+                    }
+                    else
+                    {
+                        abstractPhysicalObject = new AbstractConsumable(room.world, spawningObject, null, spawnCoord, newID, -1, -1, null);
+                    }
+                }
+                else if (spawningObject != AbstractPhysicalObject.AbstractObjectType.Spear)
+                {
+                    if (spawningObject == AbstractPhysicalObject.AbstractObjectType.SporePlant)
+                    {
+                        abstractPhysicalObject = new SporePlant.AbstractSporePlant(room.world, null, spawnCoord, newID, -1, -1, null, false, true);
+                    }
+                    else if (spawningObject == AbstractPhysicalObject.AbstractObjectType.OverseerCarcass)
+                    {
+                        abstractPhysicalObject = new OverseerCarcass.AbstractOverseerCarcass(room.world, null, spawnCoord, room.game.GetNewID(), Color.black, 0);
+                    }
+                    else
+                    {
+                        abstractPhysicalObject = new AbstractPhysicalObject(room.world, spawningObject, null, spawnCoord, newID);
+                        if (abstractPhysicalObject is WaterNut.AbstractWaterNut)
+                        {
+                            (abstractPhysicalObject as WaterNut.AbstractWaterNut).swollen = spawnType == "swollen";
+                        }
+                    }
+                }
+                else
+                {
+                    abstractPhysicalObject = new AbstractSpear(room.world, null, spawnCoord, newID, spawnType == "explosive");
+                }
+                try
+                {
+                    abstractPhysicalObject.RealizeInRoom();
+                    if (spawningObject == AbstractPhysicalObject.AbstractObjectType.Rock)
+                    {
+                        AddCraftedRock(abstractPhysicalObject);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError(ex);
+                }
+                realizedObject = abstractPhysicalObject.realizedObject;
+            }
+            return realizedObject;
+        }
+
+        //Spears spawn Long Rocks
+
+        private void Rock_InitiateSprites(On.Rock.orig_InitiateSprites orig, Rock self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+            if (IsCraftedRock(self.abstractPhysicalObject))
+            {
+                sLeaser.sprites = new FSprite[2];
+                int seed = UnityEngine.Random.seed;
+                UnityEngine.Random.seed = self.abstractPhysicalObject.ID.RandomSeed;
+                sLeaser.sprites[0] = new FSprite("SpearFragment1", true);
+                UnityEngine.Random.seed = seed;
+                TriangleMesh.Triangle[] tris = new TriangleMesh.Triangle[]
+                {
+            new TriangleMesh.Triangle(0, 1, 2)
+                };
+                TriangleMesh triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
+                sLeaser.sprites[1] = triangleMesh;
+                self.AddToContainer(sLeaser, rCam, null);
+            }
+            else
+            {
+                orig.Invoke(self, sLeaser, rCam);
+            }
+        }
+
+        public bool IsCraftedRock(AbstractPhysicalObject craftedRock)
+        {
+            foreach (var apo in CraftedRocks)
+            {
+                if (apo == craftedRock)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void RemoveCraftedRock(AbstractPhysicalObject craftedRock)
+        {
+            if (CraftedRocks.Contains(craftedRock))
+            {
+                List<AbstractPhysicalObject> content = CraftedRocks;
+                content.Remove(craftedRock);
+            }
+        }
+
+        public void AddCraftedRock(AbstractPhysicalObject craftedRock)
+        {
+            List<AbstractPhysicalObject> content = CraftedRocks;
+            content.Add(craftedRock);
+        }
+
+        //Graphics
+
+        public void AnimateCraft(Player self)
+        {
+            if (self.graphicsModule != null && (self.grasps[0] != null || self.grasps[1] != null) && self.graphicsModule is PlayerGraphics)
+            {
+                PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
+                if (CraftingCounter % 40 == 0)
+                {
+                    pg.blink = 20;
+                }
+                if (self.grasps[0] != null && self.grasps[1] != null)
+                {
+                    if (CraftingCounter % 50 == 0)
+                    {
+                        LookAtPrimary = !LookAtPrimary;
+                    }
+                    pg.objectLooker.currentMostInteresting = LookAtPrimary ? self.grasps[0].grabbed : self.grasps[1].grabbed;
+                }
+                else if (self.grasps[1] != null)
+                {
+                    pg.objectLooker.currentMostInteresting = self.grasps[1].grabbed;
+                }
+                else
+                {
+                    pg.objectLooker.currentMostInteresting = self.grasps[0].grabbed;
+                }
+                pg.head.vel += Custom.DirVec(pg.drawPositions[0, 0], pg.objectLooker.mostInterestingLookPoint);
+            }
+        }
+
+        public void AnimateSuccess(Player self)
+        {
+            if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
+            {
+                PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
+                pg.objectLooker.LookAtNothing();
+                pg.blink = 50;
+            }
+        }
     }
 }
