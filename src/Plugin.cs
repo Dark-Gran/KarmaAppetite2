@@ -99,6 +99,9 @@ namespace KarmaAppetite
 
             //Crafting
             On.AbstractPhysicalObject.Realize += hook_AbstractPhysicalObject_Realize;
+
+            //Tunneling
+            //On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
         }
 
         public void OnDisable()
@@ -117,6 +120,22 @@ namespace KarmaAppetite
         private const int FOOD_POTENTIAL = 14; //max food with max karma
 
         //---VISUALS---
+
+        //commented out because it does not work universally, some objects/parts remain visible (for some reason)
+        /*private void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            foreach (Creature.Grasp grabbedBy in self.owner.grabbedBy)
+            {
+                if (grabbedBy.grabber is Player)
+                {
+                    for (int i = 0; i < sLeaser.sprites.Length; i++)
+                    {
+                        sLeaser.sprites[i].isVisible = !IsInTunnel;
+                    }
+                }
+            }
+        }*/
 
         private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
@@ -162,13 +181,19 @@ namespace KarmaAppetite
                         }
                         else
                         {
-                            sLeaser.sprites[11].x = self.head.pos.x - camPos.x;
-                            sLeaser.sprites[11].y = self.head.pos.y - camPos.y;
+                            sLeaser.sprites[i].isVisible = true;
+                            sLeaser.sprites[i].x = self.head.pos.x - camPos.x;
+                            sLeaser.sprites[i].y = self.head.pos.y - camPos.y;
+                            sLeaser.sprites[i].scale = 9f;
                         }
                     }
                     else if ((i < 4 || i > 8) && i != 12 && i != 13 && i < 15)
                     {
                         sLeaser.sprites[i].isVisible = true;
+                        if (i == 11)
+                        {
+                            sLeaser.sprites[i].scale = 5f;
+                        }
                     }
                 }
             }
