@@ -470,7 +470,7 @@ namespace KarmaAppetite
 
         private bool CanAffordCraft(Player self, int craftPrice)
         {
-            return true; //(self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= STARTING_MAX_KARMA;
+            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= STARTING_MAX_KARMA;
         }
 
         private void PayDay(Player self, int quarterPrice)
@@ -479,7 +479,7 @@ namespace KarmaAppetite
             {
                 for (int i = 0; i < quarterPrice; i++)
                 {
-                    //RemoveQuarterFood(self);
+                    RemoveQuarterFood(self);
                 }
             }
         }
@@ -509,8 +509,9 @@ namespace KarmaAppetite
                 if (CanAffordCraft(self, 1)) //"find debris"
                 {
                     PhysicalObject newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
+                    PayDay(self, 1);
                     if (newItem != null)
-                    {   
+                    {
                         self.SlugcatGrab(newItem, 0);
                         success = true;
                     }
@@ -530,16 +531,16 @@ namespace KarmaAppetite
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordCraft(self, 2)) //Rock + Rock = Spear
+                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordCraft(self, 1)) //Rock + Rock = Spear
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "");
-                        PayDay(self, 2);
+                        PayDay(self, 1);
                         break;
                     }
-                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordCraft(self, 3)) //Firecracker + Waternut/Rock = Bomb
+                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordCraft(self, 2)) //Firecracker + Waternut/Rock = Bomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, room, self.abstractCreature.pos, "");
-                        PayDay(self, 3);
+                        PayDay(self, 2);
                         break;
                     }
                     if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordCraft(self, 1)) //Firecracker + Firecracker = Beebomb
@@ -548,10 +549,9 @@ namespace KarmaAppetite
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is SlimeMold && physicalObject2 is DangleFruit && CanAffordCraft(self, 1)) //Slimemold + Dangle = Lantern
+                    if (physicalObject is SlimeMold && physicalObject2 is DangleFruit) //Slimemold + Dangle = Lantern
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Lantern, room, self.abstractCreature.pos, "");
-                        PayDay(self, 1);
                         break;
                     }
                     if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordCraft(self, 1)) //VultureWorm + Dangle = GrappleWorm
@@ -591,6 +591,21 @@ namespace KarmaAppetite
                         PayDay(self, 4);
                         break;
                     }
+                    //alternative route to explosives
+                    if (physicalObject is SSOracleSwarmer && physicalObject2 is Rock) //Neuron + Rock = Overseer
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.OverseerCarcass, room, self.abstractCreature.pos, "");
+                        physicalObject.Destroy();
+                        noDestruction = true;
+                        break;
+                    }
+                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2)) //Overseer + Overseer = Firecracker
+                    {
+                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
+                        PayDay(self, 2);
+                        break;
+                    }
+                    //killing in-hands
                     if (physicalObject is Creature && (physicalObject2 is Rock || physicalObject2 is Spear)) //Creature + Spear/Rock = Killed Creature
                     {
                         if (!(physicalObject as Creature).dead)
@@ -628,21 +643,8 @@ namespace KarmaAppetite
                         }
                         break;
                     }
-                    //alternative route to explosives
-                    if (physicalObject is SSOracleSwarmer && physicalObject2 is Rock) //Neuron + Rock = Overseer
-                    {
-                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.OverseerCarcass, room, self.abstractCreature.pos, "");
-                        physicalObject.Destroy();
-                        noDestruction = true;
-                        break;
-                    }
-                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 4)) //Overseer + Overseer = Firecracker
-                    {
-                        newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
-                        PayDay(self, 4);
-                        break;
-                    }
-
+                    
+                    //switch items for the second check
                     PhysicalObject physicalObject13 = physicalObject;
                     physicalObject = physicalObject2;
                     physicalObject2 = physicalObject13;
