@@ -73,7 +73,6 @@ namespace KarmaAppetite
 
             //Crafting
             On.Player.Update += hook_Player_Update;
-            On.Rock.InitiateSprites += hook_Rock_InitiateSprites;
         }
 
 
@@ -387,11 +386,11 @@ namespace KarmaAppetite
 
         //CRAFTING BASICS
 
+        private static int CRAFTING_TIME = 140;
         private int CraftingCounter = 0;
         private bool CraftingLock = false;
         private int LockCounter = 0;
         private bool LookAtPrimary = true;
-        private List<AbstractPhysicalObject> CraftedRocks; //specific visuals retained only until session end
 
         private void hook_Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
@@ -400,7 +399,7 @@ namespace KarmaAppetite
             if (Input.GetKey(KeyCode.Q) && IsReadyToCraft(self) && !CraftingLock)
             {
                 CraftingCounter++;
-                if (CraftingCounter > 200)
+                if (CraftingCounter > CRAFTING_TIME)
                 {
                     CraftingLock = true;
                     Craft(self, eu);
@@ -438,7 +437,7 @@ namespace KarmaAppetite
 
         private bool CanAffordCraft(Player self, int craftPrice)
         {
-            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= STARTING_MAX_KARMA;
+            return true; //(self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= STARTING_MAX_KARMA;
         }
 
         private void PayDay(Player self, int quarterPrice)
@@ -447,7 +446,7 @@ namespace KarmaAppetite
             {
                 for (int i = 0; i < quarterPrice; i++)
                 {
-                    RemoveQuarterFood(self);
+                    //RemoveQuarterFood(self);
                 }
             }
         }
@@ -603,15 +602,7 @@ namespace KarmaAppetite
                 {
                     if (!noDestruction)
                     {
-                        if (IsCraftedRock(physicalObject.abstractPhysicalObject))
-                        {
-                            RemoveCraftedRock(physicalObject.abstractPhysicalObject);
-                        }
                         physicalObject.Destroy();
-                        if (IsCraftedRock(physicalObject2.abstractPhysicalObject))
-                        {
-                            RemoveCraftedRock(physicalObject2.abstractPhysicalObject);
-                        }
                         physicalObject2.Destroy();
                     }
                     if (!(newItem is OracleSwarmer))
@@ -729,10 +720,6 @@ namespace KarmaAppetite
                 try
                 {
                     abstractPhysicalObject.RealizeInRoom();
-                    if (spawningObject == AbstractPhysicalObject.AbstractObjectType.Rock)
-                    {
-                        AddCraftedRock(abstractPhysicalObject);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -741,46 +728,6 @@ namespace KarmaAppetite
                 realizedObject = abstractPhysicalObject.realizedObject;
             }
             return realizedObject;
-        }
-
-
-        //DEBRIS/ROCK SPECIFICS
-
-        private void hook_Rock_InitiateSprites(On.Rock.orig_InitiateSprites orig, Rock self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam) //Spears spawn "long rocks" (= specific visuals)
-        {
-            orig.Invoke(self, sLeaser, rCam);
-            if (IsCraftedRock(self.abstractPhysicalObject))
-            {
-                sLeaser.sprites[0] = new FSprite("SpearFragment1", true);
-                self.AddToContainer(sLeaser, rCam, null);
-            }
-        }
-
-        private bool IsCraftedRock(AbstractPhysicalObject craftedRock)
-        {
-            foreach (var apo in CraftedRocks)
-            {
-                if (apo == craftedRock)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void AddCraftedRock(AbstractPhysicalObject craftedRock)
-        {
-            List<AbstractPhysicalObject> content = CraftedRocks;
-            content.Add(craftedRock);
-        }
-
-        private void RemoveCraftedRock(AbstractPhysicalObject craftedRock)
-        {
-            if (CraftedRocks.Contains(craftedRock))
-            {
-                List<AbstractPhysicalObject> content = CraftedRocks;
-                content.Remove(craftedRock);
-            }
         }
 
         //CRAFTING ANIMATION
