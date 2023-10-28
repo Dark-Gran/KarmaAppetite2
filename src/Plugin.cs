@@ -10,6 +10,7 @@ using RWCustom;
 using UnityEngine;
 using SlugBase.Features;
 using MoreSlugcats;
+using System.Numerics;
 
 namespace KarmaAppetite
 {
@@ -117,8 +118,9 @@ namespace KarmaAppetite
 
         //---VISUALS---
 
-        private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
+
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
 
             //Saint-Hair
@@ -137,16 +139,40 @@ namespace KarmaAppetite
                     }
                     else
                     {
-                        Vector2 vector = Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
-                        Vector2 vector2 = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
-                        Vector2 vector3 = Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
-                        float num = Custom.AimFromOneVectorToAnother(Vector2.Lerp(vector2, vector, 0.5f), vector3);
+                        UnityEngine.Vector2 vector = UnityEngine.Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
+                        UnityEngine.Vector2 vector2 = UnityEngine.Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
+                        UnityEngine.Vector2 vector3 = UnityEngine.Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
+                        float num = Custom.AimFromOneVectorToAnother(UnityEngine.Vector2.Lerp(vector2, vector, 0.5f), vector3);
                         hair_num = Mathf.RoundToInt(Mathf.Abs(num / 360f * 34f));
                     }
                 }
             }
 
             sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
+
+            //Tunneling
+            for (int i = 0; i < sLeaser.sprites.Length; i++)
+            {
+                {
+                    if (IsInTunnel)
+                    {
+                        if (i != 11)
+                        {
+                            sLeaser.sprites[i].isVisible = false;
+                        }
+                        else
+                        {
+                            sLeaser.sprites[11].x = self.head.pos.x - camPos.x;
+                            sLeaser.sprites[11].y = self.head.pos.y - camPos.y;
+                        }
+                    }
+                    else if ((i < 4 || i > 8) && i != 12 && i != 13 && i < 15)
+                    {
+                        sLeaser.sprites[i].isVisible = true;
+                    }
+                }
+            }
+
         }
 
         private void RefreshGlow(Player self)
@@ -226,14 +252,14 @@ namespace KarmaAppetite
                 {
                     for (int i = -1; i < 3; i++)
                     {
-                        self.room.GetTile(self.stuckInWall.Value + new Vector2(20f * (float)i, 0f)).horizontalBeam = false;
+                        self.room.GetTile(self.stuckInWall.Value + new UnityEngine.Vector2(20f * (float)i, 0f)).horizontalBeam = false;
                     }
                 }
                 else
                 {
                     for (int j = -1; j < 3; j++)
                     {
-                        self.room.GetTile(self.stuckInWall.Value + new Vector2(0f, 20f * (float)j)).verticalBeam = false;
+                        self.room.GetTile(self.stuckInWall.Value + new UnityEngine.Vector2(0f, 20f * (float)j)).verticalBeam = false;
                     }
                 }
                 self.stuckInWall = null;
@@ -863,6 +889,7 @@ namespace KarmaAppetite
 
         private static int TUNNELING_TIME = 180;
         private static int TUNNELING_PRICE = 0;
+        private static int TUNNELING_DISTANCE = 10;
         private int TunnelingCounter = 0;
         private bool TunnelingLock = false;
         private int TunnelingLockCounter = 0;
@@ -892,7 +919,7 @@ namespace KarmaAppetite
                 }
                 else
                 {
-                    AnimateTunneling(self);
+                    AnimateTunnelFind(self);
                 }
             }
             else if (TunnelingCounter > 0)
@@ -917,16 +944,20 @@ namespace KarmaAppetite
 
         private void StartTunnel(Player self, bool eu)
         {
+
             IsInTunnel = true;
-            TunnelDestination = new IntVector2(self.abstractCreature.pos.x+10, self.abstractCreature.pos.y);
-            Room.Tile destTile = self.room.GetTile(TunnelDestination);
-            self.enteringShortCut = TunnelDestination;
+            IntVector2 startPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
+            TunnelDestination = new IntVector2(startPos.x+TUNNELING_DISTANCE, startPos.y);
             self.inShortcut = true;
+            self.abstractCreature.pos.Tile = TunnelDestination;
+            self.enteringShortCut = TunnelDestination;
+
+
         }
 
         //TUNNELING ANIMATIONS
 
-        private void AnimateTunneling(Player self) //Pathfinding animation
+        private void AnimateTunnelFind(Player self) //Pathfinding animation
         {
             if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
             {
