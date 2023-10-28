@@ -480,68 +480,68 @@ namespace KarmaAppetite
 
                 for (int j = 0; j < 2; j++)
                 {
-                    if (physicalObject is Spear && physicalObject2 is ScavengerBomb && CanAffordCraft(self, 1))
+                    if (physicalObject is Spear && physicalObject2 is ScavengerBomb && CanAffordCraft(self, 1)) //Spear + Bomb = Explosive Spear
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "explosive");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordCraft(self, 2))
+                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordCraft(self, 2)) //Rock + Rock = Spear
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "");
                         PayDay(self, 2);
                         break;
                     }
-                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordCraft(self, 3))
+                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordCraft(self, 3)) //Firecracker + Waternut/Rock = Bomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 3);
                         break;
                     }
-                    if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordCraft(self, 1))
+                    if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordCraft(self, 1)) //Firecracker + Firecracker = Beebomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SporePlant, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is SlimeMold && physicalObject2 is DangleFruit && CanAffordCraft(self, 1))
+                    if (physicalObject is SlimeMold && physicalObject2 is DangleFruit && CanAffordCraft(self, 1)) //Slimemold + Dangle = Lantern
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Lantern, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordCraft(self, 1))
+                    if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordCraft(self, 1)) //VultureWorm + Dangle = GrappleWorm
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Creature, room, self.abstractCreature.pos, "Tube Worm");
                         PayDay(self, 1);
                         break;
                     }
-                    if ((physicalObject is JellyFish && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut)) && CanAffordCraft(self, 1))
+                    if ((physicalObject is JellyFish && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut)) && CanAffordCraft(self, 1)) //Jellyfish + Dangle/Waternut = Flashbang
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FlareBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is Mushroom && physicalObject2 is Mushroom && CanAffordCraft(self, 1))
+                    if (physicalObject is Mushroom && physicalObject2 is Mushroom && CanAffordCraft(self, 1)) //Mushroom + Mushroom = Gasbomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.PuffBall, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is DataPearl && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2))
+                    if (physicalObject is DataPearl && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2)) //Pearl + Overseer = Neuron
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SSOracleSwarmer, room, self.abstractCreature.pos, "");
                         (newItem as OracleSwarmer).affectedByGravity = 0f;
                         PayDay(self, 4);
                         break;
                     }
-                    if (physicalObject is Mushroom && physicalObject2 is FlyLure && CanAffordCraft(self, 4))
+                    if (physicalObject is Mushroom && physicalObject2 is FlyLure && CanAffordCraft(self, 4)) //Mushroom + Flylure = KarmaFlower
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.KarmaFlower, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
                         break;
                     }
-                    if (physicalObject is Creature && (physicalObject2 is Rock || physicalObject2 is Spear))
+                    if (physicalObject is Creature && (physicalObject2 is Rock || physicalObject2 is Spear)) //Creature + Spear/Rock = Killed Creature
                     {
                         if (!(physicalObject as Creature).dead)
                         {
@@ -559,7 +559,7 @@ namespace KarmaAppetite
                         }
                         break;
                     }
-                    if (physicalObject is Creature && physicalObject2 is JellyFish)
+                    if (physicalObject is Creature && physicalObject2 is JellyFish) //Creature + Jellyfish = Killed Creature
                     {
                         if ((physicalObject as Creature).dead && !((physicalObject as Creature).State.meatLeft < (physicalObject as Creature).abstractCreature.creatureTemplate.meatPoints))
                         {
@@ -579,14 +579,14 @@ namespace KarmaAppetite
                         break;
                     }
                     //alternative route to explosives
-                    if (physicalObject is SSOracleSwarmer && physicalObject2 is Rock)
+                    if (physicalObject is SSOracleSwarmer && physicalObject2 is Rock) //Neuron + Rock = Overseer
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.OverseerCarcass, room, self.abstractCreature.pos, "");
                         physicalObject.Destroy();
                         noDestruction = true;
                         break;
                     }
-                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 4))
+                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 4)) //Overseer + Overseer = Firecracker
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
@@ -629,29 +629,29 @@ namespace KarmaAppetite
                 }
                 PhysicalObject objectPartA = null;
                 PhysicalObject objectPartB = null;
-                if (physicalObject is Spear)
+                if (physicalObject is Spear) // Spear => 2 Rocks
                 {
                     objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
                     objectPartB = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
                 }
-                else if (physicalObject is ExplosiveSpear)
+                else if (physicalObject is ExplosiveSpear) //Explosive Spear => Spear + Bomb
                 {
                     objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "");
                     objectPartB = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, room, self.abstractCreature.pos, "");
                 }
-                else if (physicalObject is ScavengerBomb)
+                else if (physicalObject is ScavengerBomb) //Bomb => Firecracker
                 {
                     objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
                 }
-                else if (physicalObject is Lantern)
+                else if (physicalObject is Lantern) //Lantern => Slimemold
                 {
                     objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SlimeMold, room, self.abstractCreature.pos, "");
                 }
-                else if (physicalObject is TubeWorm)
+                else if (physicalObject is TubeWorm) //Grappleworm => VultureWorm
                 {
                     objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Creature, room, self.abstractCreature.pos, "Vulture Grub");
                 }
-                else if (physicalObject is FlareBomb)
+                else if (physicalObject is FlareBomb) //Flashbang => Waternut
                 {
                     objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.WaterNut, room, self.abstractCreature.pos, "swollen");
                 }
