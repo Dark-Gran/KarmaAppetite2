@@ -202,9 +202,12 @@ namespace KarmaAppetite
         {
             orig.Invoke(self, eu);
 
-            CheckForCrafting(self, eu); //See below Appetite            
             CheckForTunneling(self, eu); //See below Crafting
-
+            if (!IsInTunnel)
+            {
+                CheckForCrafting(self, eu); //See below Appetite            
+            }
+            
         }
 
         private bool CanAffordPrice(Player self, int price, bool never_free=false)
@@ -858,16 +861,27 @@ namespace KarmaAppetite
 
         //---TUNNELING / PATHFINDING---
 
-        private static int TUNNELING_TIME = 140;
+        private static int TUNNELING_TIME = 180;
         private static int TUNNELING_PRICE = 0;
         private int TunnelingCounter = 0;
         private bool TunnelingLock = false;
         private int TunnelingLockCounter = 0;
         private bool IsInTunnel = false;
+        private IntVector2 TunnelDestination = new IntVector2(0, 0);
 
         private void CheckForTunneling(Player self, bool eu) //called by hook_Player_Update
         {
-            if (Input.GetKey(KeyCode.E) && CanTunnel(self) && !TunnelingLock && !IsInTunnel)
+            if (IsInTunnel)
+            {
+                IntVector2 currentPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
+                if (currentPos == TunnelDestination)
+                {
+                    self.enteringShortCut = null;
+                    self.inShortcut = false;
+                    IsInTunnel = false;
+                }
+            }
+            else if (Input.GetKey(KeyCode.E) && CanTunnel(self) && !TunnelingLock)
             {
                 TunnelingCounter++;
                 if (TunnelingCounter > TUNNELING_TIME)
@@ -884,9 +898,8 @@ namespace KarmaAppetite
             else if (TunnelingCounter > 0)
             {
                 TunnelingCounter = 0;
-                LookAtPrimary = true;
             }
-            if (TunnelingLock)
+            if (TunnelingLock && !IsInTunnel)
             {
                 TunnelingLockCounter++;
                 if (TunnelingLockCounter == 80)
@@ -904,7 +917,11 @@ namespace KarmaAppetite
 
         private void StartTunnel(Player self, bool eu)
         {
-            //todo
+            IsInTunnel = true;
+            TunnelDestination = new IntVector2(self.abstractCreature.pos.x+10, self.abstractCreature.pos.y);
+            Room.Tile destTile = self.room.GetTile(TunnelDestination);
+            self.enteringShortCut = TunnelDestination;
+            self.inShortcut = true;
         }
 
         //TUNNELING ANIMATIONS
