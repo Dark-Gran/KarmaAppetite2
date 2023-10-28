@@ -57,6 +57,7 @@ namespace KarmaAppetite
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu (above)
 
+            //KarmaAppetite
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
             On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
@@ -69,6 +70,10 @@ namespace KarmaAppetite
             On.Player.SetMalnourished += hook_Player_SetMalnourished;
             On.Player.AddFood += hook_Player_AddFood;
             On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
+
+            //Crafting
+            On.Player.Update += hook_Player_Update;
+            On.Rock.InitiateSprites += hook_Rock_InitiateSprites;
         }
 
 
@@ -380,6 +385,7 @@ namespace KarmaAppetite
 
         //---CRAFTING---
 
+        //CRAFTING BASICS
 
         private int CraftingCounter = 0;
         private bool CraftingLock = false;
@@ -430,23 +436,23 @@ namespace KarmaAppetite
             return (self.grasps[0] != null || self.grasps[1] != null) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 3.6f);
         }
 
-        public bool CanAffordCraft(Player self, int craftPrice) //For future split: This and PayDay are the only methods using KarmaAppetite
+        private bool CanAffordCraft(Player self, int craftPrice)
         {
-            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= KarmaAppetite.STARTING_MAX_KARMA;
+            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= craftPrice || self.Karma >= STARTING_MAX_KARMA;
         }
 
-        public void PayDay(Player self, int quarterPrice)
+        private void PayDay(Player self, int quarterPrice)
         {
-            if (self.Karma < KarmaAppetite.STARTING_MAX_KARMA)
+            if (self.Karma < STARTING_MAX_KARMA)
             {
                 for (int i = 0; i < quarterPrice; i++)
                 {
-                    KarmaAppetite.RemoveQuarterFood(self); //For future split: KarmaAppetite is the one making sure all Players have quarterFood initialized
+                    RemoveQuarterFood(self);
                 }
             }
         }
 
-        public void Craft(Player self, bool eu)
+        private void Craft(Player self, bool eu) //includes recipes
         {
             bool success = false;
             Room room = self.room;
@@ -466,7 +472,7 @@ namespace KarmaAppetite
                     }
                 }
             }
-            if (physicalObject != null && physicalObject2 != null) //2 objects
+            if (physicalObject != null && physicalObject2 != null) //combining 2 objects
             {
 
                 bool noDestruction = false;
@@ -572,7 +578,7 @@ namespace KarmaAppetite
                         }
                         break;
                     }
-                    //Alternative route to explosives
+                    //alternative route to explosives
                     if (physicalObject is SSOracleSwarmer && physicalObject2 is Rock)
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.OverseerCarcass, room, self.abstractCreature.pos, "");
@@ -591,7 +597,8 @@ namespace KarmaAppetite
                     physicalObject = physicalObject2;
                     physicalObject2 = physicalObject13;
                 }
-                //finish
+                
+                //finish 2-object craft
                 if (newItem != null || noDestruction)
                 {
                     if (!noDestruction)
@@ -614,7 +621,7 @@ namespace KarmaAppetite
                     success = true;
                 }
             }
-            else if (physicalObject != null || physicalObject2 != null) //Only 1 object (mostly reverse-engineering)
+            else if (physicalObject != null || physicalObject2 != null) //crafting with only 1 object (mostly reverse-engineering)
             {
                 if (physicalObject2 != null)
                 {
@@ -648,6 +655,8 @@ namespace KarmaAppetite
                 {
                     objectPartA = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.WaterNut, room, self.abstractCreature.pos, "swollen");
                 }
+
+                //finish 1-object craft
                 if (objectPartA != null || objectPartB != null)
                 {
                     physicalObject.Destroy();
@@ -662,6 +671,7 @@ namespace KarmaAppetite
                     success = true;
                 }
             }
+
             if (success)
             {
                 AnimateSuccess(self);
@@ -669,11 +679,11 @@ namespace KarmaAppetite
 
         }
 
-        public PhysicalObject SpawnObject(Player crafter, AbstractPhysicalObject.AbstractObjectType spawningObject, Room room, WorldCoordinate spawnCoord, string spawnType = "")
+        private PhysicalObject SpawnObject(Player crafter, AbstractPhysicalObject.AbstractObjectType spawningObject, Room room, WorldCoordinate spawnCoord, string spawnType = "")
         {
             EntityID newID = room.game.GetNewID();
             PhysicalObject realizedObject;
-            if (spawningObject == 0)
+            if (spawningObject == AbstractPhysicalObject.AbstractObjectType.Creature)
             {
                 AbstractCreature abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(spawnType), null, spawnCoord, newID);
                 abstractCreature.RealizeInRoom();
@@ -686,7 +696,7 @@ namespace KarmaAppetite
                 {
                     if (spawningObject == AbstractPhysicalObject.AbstractObjectType.DataPearl)
                     {
-                        abstractPhysicalObject = new DataPearl.AbstractDataPearl(room.world, spawningObject, null, spawnCoord, newID, -1, -1, null, 0);
+                        abstractPhysicalObject = new DataPearl.AbstractDataPearl(room.world, spawningObject, null, spawnCoord, newID, -1, -1, null, DataPearl.AbstractDataPearl.DataPearlType.Misc);
                     }
                     else
                     {
@@ -701,7 +711,7 @@ namespace KarmaAppetite
                     }
                     else if (spawningObject == AbstractPhysicalObject.AbstractObjectType.OverseerCarcass)
                     {
-                        abstractPhysicalObject = new OverseerCarcass.AbstractOverseerCarcass(room.world, null, spawnCoord, room.game.GetNewID(), Color.black, 0);
+                        abstractPhysicalObject = new OverseerCarcass.AbstractOverseerCarcass(room.world, null, spawnCoord, room.game.GetNewID(), UnityEngine.Color.black, 0);
                     }
                     else
                     {
@@ -733,32 +743,20 @@ namespace KarmaAppetite
             return realizedObject;
         }
 
-        //Spears spawn Long Rocks
 
-        private void Rock_InitiateSprites(On.Rock.orig_InitiateSprites orig, Rock self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        //DEBRIS/ROCK SPECIFICS
+
+        private void hook_Rock_InitiateSprites(On.Rock.orig_InitiateSprites orig, Rock self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam) //Spears spawn "long rocks" (= specific visuals)
         {
+            orig.Invoke(self, sLeaser, rCam);
             if (IsCraftedRock(self.abstractPhysicalObject))
             {
-                sLeaser.sprites = new FSprite[2];
-                int seed = UnityEngine.Random.seed;
-                UnityEngine.Random.seed = self.abstractPhysicalObject.ID.RandomSeed;
                 sLeaser.sprites[0] = new FSprite("SpearFragment1", true);
-                UnityEngine.Random.seed = seed;
-                TriangleMesh.Triangle[] tris = new TriangleMesh.Triangle[]
-                {
-            new TriangleMesh.Triangle(0, 1, 2)
-                };
-                TriangleMesh triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
-                sLeaser.sprites[1] = triangleMesh;
                 self.AddToContainer(sLeaser, rCam, null);
-            }
-            else
-            {
-                orig.Invoke(self, sLeaser, rCam);
             }
         }
 
-        public bool IsCraftedRock(AbstractPhysicalObject craftedRock)
+        private bool IsCraftedRock(AbstractPhysicalObject craftedRock)
         {
             foreach (var apo in CraftedRocks)
             {
@@ -770,7 +768,13 @@ namespace KarmaAppetite
             return false;
         }
 
-        public void RemoveCraftedRock(AbstractPhysicalObject craftedRock)
+        private void AddCraftedRock(AbstractPhysicalObject craftedRock)
+        {
+            List<AbstractPhysicalObject> content = CraftedRocks;
+            content.Add(craftedRock);
+        }
+
+        private void RemoveCraftedRock(AbstractPhysicalObject craftedRock)
         {
             if (CraftedRocks.Contains(craftedRock))
             {
@@ -779,15 +783,9 @@ namespace KarmaAppetite
             }
         }
 
-        public void AddCraftedRock(AbstractPhysicalObject craftedRock)
-        {
-            List<AbstractPhysicalObject> content = CraftedRocks;
-            content.Add(craftedRock);
-        }
+        //CRAFTING ANIMATION
 
-        //Graphics
-
-        public void AnimateCraft(Player self)
+        private void AnimateCraft(Player self)
         {
             if (self.graphicsModule != null && (self.grasps[0] != null || self.grasps[1] != null) && self.graphicsModule is PlayerGraphics)
             {
@@ -816,7 +814,7 @@ namespace KarmaAppetite
             }
         }
 
-        public void AnimateSuccess(Player self)
+        private void AnimateSuccess(Player self)
         {
             if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
             {
