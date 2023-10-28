@@ -781,10 +781,10 @@ namespace KarmaAppetite
 
             public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
             {
+                base.InitiateSprites(sLeaser, rCam);
+
                 sLeaser.sprites = new FSprite[2];
-
                 sLeaser.sprites[0] = new FSprite("SpearFragment1", true);
-
                 TriangleMesh.Triangle[] tris = new TriangleMesh.Triangle[]
                 {
                     new TriangleMesh.Triangle(0, 1, 2)
