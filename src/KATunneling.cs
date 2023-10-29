@@ -250,6 +250,8 @@ namespace KarmaAppetite
             On.MoreSlugcats.MoonCloak.DrawSprites += hook_MoonCloak_DrawSprites;
             On.JokeRifle.DrawSprites += hook_JokeRifle_DrawSprites;
             //creatures
+            On.FlyGraphics.DrawSprites += hook_FlyGraphics_DrawSprites;
+            On.JellyFish.DrawSprites += hook_JellyFish_DrawSprites;
 
         }
 
@@ -270,7 +272,7 @@ namespace KarmaAppetite
             }
         }
 
-        private static void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        private static void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos) //Works only on those that call base method without adding too much
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
             HideIfGrabbedInTunnel(sLeaser, self.owner, rCam, timeStacker, camPos);
@@ -459,6 +461,18 @@ namespace KarmaAppetite
         }
 
         private static void hook_JokeRifle_DrawSprites(On.JokeRifle.orig_DrawSprites orig, JokeRifle self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_FlyGraphics_DrawSprites(On.FlyGraphics.orig_DrawSprites orig, FlyGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self.owner, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_JellyFish_DrawSprites(On.JellyFish.orig_DrawSprites orig, JellyFish self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
             HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
