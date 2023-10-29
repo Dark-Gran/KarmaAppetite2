@@ -102,6 +102,7 @@ namespace KarmaAppetite
 
             //Tunneling
             //On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
+            On.Player.MovementUpdate += hook_Player_MovementUpdate;
         }
 
         public void OnDisable()
@@ -915,12 +916,13 @@ namespace KarmaAppetite
         private const int TUNNELING_TIME = 180;
         private const int TUNNELING_PRICE = 0;
         private const int TUNNELING_DISTANCE = 10;
-        private const float TUNNEL_MARK_SIZE = 7f;
+        private const float TUNNEL_MARK_SIZE = 8.5f;
         private int TunnelingCounter = 0;
         private bool TunnelingLock = false;
         private int TunnelingLockCounter = 0;
         private bool IsInTunnel = false;
         private IntVector2 TunnelDestination = new IntVector2(0, 0);
+        private UnityEngine.Vector2 InputDirection = new UnityEngine.Vector2(0, 0);
 
         private void CheckForTunneling(Player self, bool eu) //called by hook_Player_Update
         {
@@ -968,22 +970,41 @@ namespace KarmaAppetite
             return CanAffordPrice(self, TUNNELING_PRICE) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
         }
 
+        private void hook_Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
+        {
+            if (IsInTunnel || TunnelingCounter > 0)
+            {
+                InputDirection.x = self.input[0].x;
+                InputDirection.y = self.input[0].y;
+                self.input[0].x = 0;
+                self.input[0].y = 0;    
+            }
+            orig.Invoke(self, eu);
+        }
+
         private void StartTunnel(Player self, bool eu)
         {
 
-            IntVector2 direction = new IntVector2(-1, 0);
-            if (self.input[0].y == 0) //right and left
+            IntVector2 direction = new IntVector2(1, 0);
+            if (InputDirection.y == 0)
             {
-                if (self.mainBodyChunk.pos.x-self.mainBodyChunk.lastPos.x < 0)
+                if (InputDirection.x < 0)
                 {
-                    direction.x = 1;
+                    direction.x = -1;
                 }
             }
-            else //up and down
+            else
             {
-
+                direction.x = 0;
+                if (InputDirection.y < 0)
+                {
+                    direction.y = -1;
+                }
+                else
+                {
+                    direction.y = 1;
+                }
             }
-
 
             direction *= TUNNELING_DISTANCE;
             IntVector2 startPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
