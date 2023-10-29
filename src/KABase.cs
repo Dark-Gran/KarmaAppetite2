@@ -23,7 +23,7 @@ namespace KarmaAppetite
 
         public void OnEnable()
         {
-            
+
             //Resources
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             //Config menu
@@ -69,7 +69,7 @@ namespace KarmaAppetite
 
         //---CONFIG MENU---
 
-        private KAOptions optionsInstance;
+        public static KAOptions optionsInstance = new KAOptions();
         private bool initialized;
 
         public void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
@@ -80,14 +80,14 @@ namespace KarmaAppetite
                 return;
             }
             this.initialized = true;
-            this.optionsInstance = new KAOptions(this);
+            optionsInstance = new KAOptions();
             try
             {
-                MachineConnector.SetRegisteredOI(MOD_ID, this.optionsInstance);
+                MachineConnector.SetRegisteredOI(MOD_ID, optionsInstance);
             }
             catch (Exception ex)
             {
-                Debug.Log(string.Format("Karma Appetite Options: Hook_OnModsInit options failed init error {0}{1}", this.optionsInstance, ex));
+                Debug.Log(string.Format("Karma Appetite Options: Hook_OnModsInit options failed init error {0}{1}", optionsInstance, ex));
                 base.Logger.LogError(ex);
                 base.Logger.LogMessage("OOPS");
             }
@@ -123,31 +123,37 @@ namespace KarmaAppetite
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
 
             //Saint-Hair
-            int hair_num = 0;
-            if (self.player.sleepCurlUp > 0f)
+
+            if (!optionsInstance.noHair.Value) 
             {
-                hair_num = Custom.IntClamp((int)Mathf.Lerp((float)7, 4f, self.player.sleepCurlUp), 0, 8);
-            }
-            else if (self.owner.room != null && self.owner.EffectiveRoomGravity != 0f)
-            {
-                if (self.player.Consious)
+                
+                int hair_num = 0;
+                if (self.player.sleepCurlUp > 0f)
                 {
-                    if ((self.player.bodyMode == Player.BodyModeIndex.Stand && self.player.input[0].x != 0) || self.player.bodyMode == Player.BodyModeIndex.Crawl)
+                    hair_num = Custom.IntClamp((int)Mathf.Lerp((float)7, 4f, self.player.sleepCurlUp), 0, 8);
+                }
+                else if (self.owner.room != null && self.owner.EffectiveRoomGravity != 0f)
+                {
+                    if (self.player.Consious)
                     {
-                        hair_num = self.player.bodyMode == Player.BodyModeIndex.Crawl ? 7 : 6;
-                    }
-                    else
-                    {
-                        UnityEngine.Vector2 vector = UnityEngine.Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
-                        UnityEngine.Vector2 vector2 = UnityEngine.Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
-                        UnityEngine.Vector2 vector3 = UnityEngine.Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
-                        float num = Custom.AimFromOneVectorToAnother(UnityEngine.Vector2.Lerp(vector2, vector, 0.5f), vector3);
-                        hair_num = Mathf.RoundToInt(Mathf.Abs(num / 360f * 34f));
+                        if ((self.player.bodyMode == Player.BodyModeIndex.Stand && self.player.input[0].x != 0) || self.player.bodyMode == Player.BodyModeIndex.Crawl)
+                        {
+                            hair_num = self.player.bodyMode == Player.BodyModeIndex.Crawl ? 7 : 6;
+                        }
+                        else
+                        {
+                            UnityEngine.Vector2 vector = UnityEngine.Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
+                            UnityEngine.Vector2 vector2 = UnityEngine.Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
+                            UnityEngine.Vector2 vector3 = UnityEngine.Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
+                            float num = Custom.AimFromOneVectorToAnother(UnityEngine.Vector2.Lerp(vector2, vector, 0.5f), vector3);
+                            hair_num = Mathf.RoundToInt(Mathf.Abs(num / 360f * 34f));
+                        }
                     }
                 }
-            }
 
-            sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
+                sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
+
+            }
 
             //Golden eyes on Karma10
 
@@ -177,9 +183,18 @@ namespace KarmaAppetite
             {
                 self.glowing = glowing;
                 (self.State as PlayerNPCState).Glowing = true;
+                if (self.room != null)
+                {
+                    if (self.room.game.session is StoryGameSession)
+                    {
+                        (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
+                    }
+                }
+
+                /*
                 if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
                 {
-                    /*PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
+                    PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
                     if (!glowing)
                     {
                         ((PlayerGraphics)self.graphicsModule).lightSource.Destroy();
@@ -191,22 +206,17 @@ namespace KarmaAppetite
                         pg.lightSource.setRad = new float?(300f);
                         pg.lightSource.setAlpha = new float?(1f);
                         self.room.AddObject(pg.lightSource);
-                    }*/
+                    }
                     
                 }
-                if (self.room != null)
-                {
-                    if (self.room.game.session is StoryGameSession)
-                    {
-                        (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
-                    }
-                }
+                */
+
             }
         }
 
         private static bool ShouldGlow(int karma, int food)
         {
-            return karma >= KABase.STARTING_MAX_KARMA && food != 0;
+            return optionsInstance.alwaysGlow.Value || (karma >= KABase.STARTING_MAX_KARMA && food != 0);
         }
 
         private void hook_OracleSwarmer_BitByPlayer(On.OracleSwarmer.orig_BitByPlayer orig, OracleSwarmer self, Creature.Grasp grasp, bool eu)
@@ -408,6 +418,11 @@ namespace KarmaAppetite
 
         }
 
+        public static bool CanAffordCraft(Player self, int price, bool neverFree = false)
+        {
+            return optionsInstance.freeCraft.Value || CanAffordPrice(self, price, neverFree);
+        }
+
         public static bool CanAffordPrice(Player self, int price, bool neverFree = false)
         {
             return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || (self.Karma >= STARTING_MAX_KARMA && !neverFree);
@@ -540,7 +555,7 @@ namespace KarmaAppetite
             }
             if (physicalObject == null && physicalObject2 == null) //empty-handed
             {
-                if (CanAffordPrice(self, 1)) //"find debris"
+                if (CanAffordCraft(self, 1)) //"find debris"
                 {
                     PhysicalObject newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Rock, room, self.abstractCreature.pos, "");
                     PayDay(self, 1);
@@ -559,68 +574,68 @@ namespace KarmaAppetite
 
                 for (int j = 0; j < 2; j++)
                 {
-                    if (physicalObject is Spear && physicalObject2 is ScavengerBomb && CanAffordPrice(self, 1)) //Spear + Bomb = Explosive Spear
+                    if (physicalObject is Spear && physicalObject2 is ScavengerBomb && CanAffordCraft(self, 1)) //Spear + Bomb = Explosive Spear
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "explosive");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordPrice(self, 1)) //Rock + Rock = Spear
+                    if (physicalObject is Rock && physicalObject2 is Rock && CanAffordCraft(self, 1)) //Rock + Rock = Spear
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Spear, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordPrice(self, 2)) //Firecracker + Waternut/Rock = Bomb
+                    if ((physicalObject is FirecrackerPlant && (physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut || physicalObject2 is Rock)) && CanAffordCraft(self, 2)) //Firecracker + Waternut/Rock = Bomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.ScavengerBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 2);
                         break;
                     }
-                    if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordPrice(self, 1)) //Firecracker + Firecracker = Beebomb
+                    if (physicalObject is FirecrackerPlant && physicalObject2 is FirecrackerPlant && CanAffordCraft(self, 1)) //Firecracker + Firecracker = Beebomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SporePlant, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if ((physicalObject is SlimeMold || physicalObject is JellyFish || physicalObject is OverseerCarcass || physicalObject is OracleSwarmer || physicalObject is FlareBomb) && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut) && CanAffordPrice(self, 1)) //Slimemold/JellyFish/Overseer/Neuron/Flashbang + Dangle/Waternut = Lantern
+                    if ((physicalObject is SlimeMold || physicalObject is JellyFish || physicalObject is OverseerCarcass || physicalObject is OracleSwarmer || physicalObject is FlareBomb) && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut) && CanAffordCraft(self, 1)) //Slimemold/JellyFish/Overseer/Neuron/Flashbang + Dangle/Waternut = Lantern
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Lantern, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordPrice(self, 1)) //VultureWorm + Dangle = GrappleWorm
+                    if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordCraft(self, 1)) //VultureWorm + Dangle = GrappleWorm
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Creature, room, self.abstractCreature.pos, "Tube Worm");
                         PayDay(self, 1);
                         break;
                     }
-                    if ((physicalObject is JellyFish && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut)) && CanAffordPrice(self, 1)) //Jellyfish + Dangle/Waternut = Flashbang
+                    if ((physicalObject is JellyFish && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut)) && CanAffordCraft(self, 1)) //Jellyfish + Dangle/Waternut = Flashbang
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FlareBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is Mushroom && physicalObject2 is Mushroom && CanAffordPrice(self, 1)) //Mushroom + Mushroom = Gasbomb
+                    if (physicalObject is Mushroom && physicalObject2 is Mushroom && CanAffordCraft(self, 1)) //Mushroom + Mushroom = Gasbomb
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.PuffBall, room, self.abstractCreature.pos, "");
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is DataPearl && physicalObject2 is OverseerCarcass && CanAffordPrice(self, 2)) //Pearl + Overseer = Neuron
+                    if (physicalObject is DataPearl && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2)) //Pearl + Overseer = Neuron
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.SSOracleSwarmer, room, self.abstractCreature.pos, "");
                         (newItem as OracleSwarmer).affectedByGravity = 0f;
                         PayDay(self, 4);
                         break;
                     }
-                    if (physicalObject is Mushroom && physicalObject2 is FlyLure && CanAffordPrice(self, 4)) //Mushroom + Flylure = KarmaFlower
+                    if (physicalObject is Mushroom && physicalObject2 is FlyLure && CanAffordCraft(self, 4)) //Mushroom + Flylure = KarmaFlower
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.KarmaFlower, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
                         break;
                     }
-                    if (self.Karma >= 9 && ((physicalObject is OracleSwarmer && physicalObject2 is OracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordPrice(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
+                    if (self.Karma >= 9 && ((physicalObject is OracleSwarmer && physicalObject2 is OracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordCraft(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
                     {
                         newItem = SpawnObject(self, MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
@@ -634,7 +649,7 @@ namespace KarmaAppetite
                         noDestruction = true;
                         break;
                     }
-                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordPrice(self, 2)) //Overseer + Overseer = Firecracker
+                    if (physicalObject is OverseerCarcass && physicalObject2 is OverseerCarcass && CanAffordCraft(self, 2)) //Overseer + Overseer = Firecracker
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant, room, self.abstractCreature.pos, "");
                         PayDay(self, 2);

@@ -97,7 +97,7 @@ namespace KarmaAppetite
 
         private static bool CanTunnel(Player self)
         {
-            return KABase.CanAffordPrice(self, TUNNELING_PRICE) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
+            return (KABase.optionsInstance.freeTunnels.Value || KABase.CanAffordPrice(self, TUNNELING_PRICE)) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
         }
 
         private static void hook_Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
@@ -177,8 +177,8 @@ namespace KarmaAppetite
 
         //SLUGCAT HIDE
 
-        private const int TUNNEL_SHOW_TIME = 16; //in-tunnel blinking
-        private const int TUNNEL_HIDE_TIME = 10;
+        private const int TUNNEL_SHOW_TIME = 14; //in-tunnel blinking
+        private const int TUNNEL_HIDE_TIME = 11;
         private static int blinkingCounter = 0;
         private static bool tunnelShow = true;
         
@@ -196,10 +196,13 @@ namespace KarmaAppetite
                         }
                         else
                         {
-                            if ((tunnelShow && blinkingCounter >= TUNNEL_SHOW_TIME) || (!tunnelShow && blinkingCounter >= TUNNEL_HIDE_TIME))
+                            if (!KABase.optionsInstance.noBlinks.Value)
                             {
-                                tunnelShow = !tunnelShow;
-                                blinkingCounter = 0;
+                                if ((tunnelShow && blinkingCounter >= TUNNEL_SHOW_TIME) || (!tunnelShow && blinkingCounter >= TUNNEL_HIDE_TIME))
+                                {
+                                    tunnelShow = !tunnelShow;
+                                    blinkingCounter = 0;
+                                }
                             }
                             sLeaser.sprites[i].isVisible = tunnelShow;
                             sLeaser.sprites[i].x = pg.head.pos.x - camPos.x;
