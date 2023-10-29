@@ -13,14 +13,14 @@ namespace KarmaAppetite
 {
     internal class KATunneling //TUNNELING / PATHFINDING
     {
-        
+
         //-------APPLY HOOKS-------
 
         public static void KATunneling_Hooks()
         {
 
             On.Player.MovementUpdate += hook_Player_MovementUpdate;
-            TunnelingHooksForHidingCarried(); //hooks DrawSprites (GraphicsModule, Rock, Spear...)
+            TunnelingHooksForHidingCarried(); //hooks DrawSprites (GraphicsModule, Rock, Spear, Data Pearl...)
         }
 
 
@@ -189,11 +189,11 @@ namespace KarmaAppetite
                             if (InputDirection.y == 0)
                             {
                                 sLeaser.sprites[i].scaleX = 14f;
-                                sLeaser.sprites[i].scaleY = 5f;
+                                sLeaser.sprites[i].scaleY = 4f;
                             }
                             else
                             {
-                                sLeaser.sprites[i].scaleX = 5f;
+                                sLeaser.sprites[i].scaleX = 4f;
                                 sLeaser.sprites[i].scaleY = 14f;
                             }
                         }
@@ -214,7 +214,9 @@ namespace KarmaAppetite
 
         private static void TunnelingHooksForHidingCarried()
         {
+            //generic
             On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
+            //objects
             On.Rock.DrawSprites += hook_Rock_DrawSprites;
             On.Spear.DrawSprites += hook_Spear_DrawSprites;
             On.DataPearl.DrawSprites += hook_DataPearl_DrawSprites;
@@ -223,9 +225,35 @@ namespace KarmaAppetite
             On.FirecrackerPlant.DrawSprites += hook_FirecrackerPlant_DrawSprites;
             On.ScavengerBomb.DrawSprites += hook_ScavengerBomb_DrawSprites;
             On.DangleFruit.DrawSprites += hook_DangleFruit_DrawSprites;
+            On.SlimeMold.DrawSprites += hook_SlimeMold_DrawSprites;
+            On.WaterNut.DrawSprites += hook_WaterNut_DrawSprites;
+            On.SwollenWaterNut.DrawSprites += hook_SwollenWaterNut_DrawSprites;
+            On.FlyLure.DrawSprites += hook_FlyLure_DrawSprites;
+            On.Mushroom.DrawSprites += hook_Mushroom_DrawSprites;
+            On.SporePlant.DrawSprites += hook_SporePlant_DrawSprites;
+            On.Lantern.DrawSprites += hook_Lantern_DrawSprites;
+            On.PuffBall.DrawSprites += hook_PuffBall_DrawSprites;
+            On.KarmaFlower.DrawSprites += hook_KarmaFlower_DrawSprites;
+            On.FlareBomb.DrawSprites += hook_FlareBomb_DrawSprites;
+            On.BubbleGrass.DrawSprites += hook_BubbleGrass_DrawSprites;
+            On.NeedleEgg.DrawSprites += hook_NeedleEgg_DrawSprites;
+            On.EggBugEgg.DrawSprites += hook_EggBugEgg_DrawSprites;
+            On.VultureMask.DrawSprites += hook_VultureMask_DrawSprites;
+            On.MoreSlugcats.FireEgg.DrawSprites += hook_FireEgg_DrawSprites;
+            On.MoreSlugcats.ElectricSpear.DrawSprites += hook_ElectricSpear_DrawSprites;
+            On.MoreSlugcats.EnergyCell.DrawSprites += hook_EnergyCell_DrawSprites;
+            On.MoreSlugcats.SingularityBomb.DrawSprites += hook_SingularityBomb_DrawSprites;
+            On.MoreSlugcats.GooieDuck.DrawSprites += hook_GooieDuck_DrawSprites;
+            On.MoreSlugcats.LillyPuck.DrawSprites += hook_LillyPuck_DrawSprites;
+            On.MoreSlugcats.DandelionPeach.DrawSprites += hook_DandelionPeach_DrawSprites;
+            On.MoreSlugcats.GlowWeed.DrawSprites += hook_GlowWeed_DrawSprites;
+            On.MoreSlugcats.MoonCloak.DrawSprites += hook_MoonCloak_DrawSprites;
+            On.JokeRifle.DrawSprites += hook_JokeRifle_DrawSprites;
+            //creatures
+
         }
 
-        private static void HideAllSpritesIfGrabbed(RoomCamera.SpriteLeaser sLeaser, PhysicalObject po, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos, List<int> exclude = null)
+        private static void HideIfGrabbedInTunnel(RoomCamera.SpriteLeaser sLeaser, PhysicalObject po, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos, List<int> exclude = null)
         {
             foreach (Creature.Grasp grabbedBy in po.grabbedBy)
             {
@@ -245,58 +273,196 @@ namespace KarmaAppetite
         private static void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self.owner, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self.owner, rCam, timeStacker, camPos);
         }
 
         private static void hook_Rock_DrawSprites(On.Rock.orig_DrawSprites orig, Rock self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos, new List<int> { 1 });
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos, new List<int> { 1 });
         }
 
         private static void hook_Spear_DrawSprites(On.Spear.orig_DrawSprites orig, Spear self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
         }
 
         private static void hook_DataPearl_DrawSprites(On.DataPearl.orig_DrawSprites orig, DataPearl self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
         }
 
         private static void hook_OverseerCarcass_DrawSprites(On.OverseerCarcass.orig_DrawSprites orig, OverseerCarcass self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
         }
 
         private static void hook_OracleSwarmer_DrawSprites(On.OracleSwarmer.orig_DrawSprites orig, OracleSwarmer self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
         }
 
         private static void hook_FirecrackerPlant_DrawSprites(On.FirecrackerPlant.orig_DrawSprites orig, FirecrackerPlant self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
         }
 
         private static void hook_ScavengerBomb_DrawSprites(On.ScavengerBomb.orig_DrawSprites orig, ScavengerBomb self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos, new List<int> { self.spikes.Length + 3 });
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos, new List<int> { self.spikes.Length + 3 });
         }
 
         private static void hook_DangleFruit_DrawSprites(On.DangleFruit.orig_DrawSprites orig, DangleFruit self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
         }
 
+        private static void hook_SlimeMold_DrawSprites(On.SlimeMold.orig_DrawSprites orig, SlimeMold self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
 
+        private static void hook_WaterNut_DrawSprites(On.WaterNut.orig_DrawSprites orig, WaterNut self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_SwollenWaterNut_DrawSprites(On.SwollenWaterNut.orig_DrawSprites orig, SwollenWaterNut self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_FlyLure_DrawSprites(On.FlyLure.orig_DrawSprites orig, FlyLure self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_Mushroom_DrawSprites(On.Mushroom.orig_DrawSprites orig, Mushroom self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_SporePlant_DrawSprites(On.SporePlant.orig_DrawSprites orig, SporePlant self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_Lantern_DrawSprites(On.Lantern.orig_DrawSprites orig, Lantern self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_PuffBall_DrawSprites(On.PuffBall.orig_DrawSprites orig, PuffBall self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_KarmaFlower_DrawSprites(On.KarmaFlower.orig_DrawSprites orig, KarmaFlower self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_FlareBomb_DrawSprites(On.FlareBomb.orig_DrawSprites orig, FlareBomb self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos, new List<int> { 1 });
+        }
+
+        private static void hook_BubbleGrass_DrawSprites(On.BubbleGrass.orig_DrawSprites orig, BubbleGrass self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_NeedleEgg_DrawSprites(On.NeedleEgg.orig_DrawSprites orig, NeedleEgg self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_EggBugEgg_DrawSprites(On.EggBugEgg.orig_DrawSprites orig, EggBugEgg self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_VultureMask_DrawSprites(On.VultureMask.orig_DrawSprites orig, VultureMask self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_FireEgg_DrawSprites(On.MoreSlugcats.FireEgg.orig_DrawSprites orig, MoreSlugcats.FireEgg self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_ElectricSpear_DrawSprites(On.MoreSlugcats.ElectricSpear.orig_DrawSprites orig, MoreSlugcats.ElectricSpear self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_EnergyCell_DrawSprites(On.MoreSlugcats.EnergyCell.orig_DrawSprites orig, MoreSlugcats.EnergyCell self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_SingularityBomb_DrawSprites(On.MoreSlugcats.SingularityBomb.orig_DrawSprites orig, MoreSlugcats.SingularityBomb self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos, new List<int> { self.connections.Length });
+        }
+        private static void hook_GooieDuck_DrawSprites(On.MoreSlugcats.GooieDuck.orig_DrawSprites orig, MoreSlugcats.GooieDuck self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+        private static void hook_LillyPuck_DrawSprites(On.MoreSlugcats.LillyPuck.orig_DrawSprites orig, MoreSlugcats.LillyPuck self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+        private static void hook_DandelionPeach_DrawSprites(On.MoreSlugcats.DandelionPeach.orig_DrawSprites orig, MoreSlugcats.DandelionPeach self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+        private static void hook_GlowWeed_DrawSprites(On.MoreSlugcats.GlowWeed.orig_DrawSprites orig, MoreSlugcats.GlowWeed self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_MoonCloak_DrawSprites(On.MoreSlugcats.MoonCloak.orig_DrawSprites orig, MoreSlugcats.MoonCloak self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
+
+        private static void hook_JokeRifle_DrawSprites(On.JokeRifle.orig_DrawSprites orig, JokeRifle self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideIfGrabbedInTunnel(sLeaser, self, rCam, timeStacker, camPos);
+        }
 
     }
 }
