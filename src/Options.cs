@@ -12,7 +12,7 @@ namespace KarmaAppetite
 
         public readonly Configurable<bool> testCheckBox;
 
-        public OptionsMenu(KarmaAppetite.Plugin plugin)
+        public OptionsMenu(KarmaAppetite.KABase plugin)
         {
             this.testCheckBox = this.config.Bind<bool>("KarmaAppetite_TestCheckBox", true, new ConfigurableInfo(null));
         }

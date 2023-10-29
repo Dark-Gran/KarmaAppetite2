@@ -16,13 +16,61 @@ namespace KarmaAppetite
 {
 
     [BepInPlugin(MOD_ID, "Karma Appetite", "2.0")]
-    public class Plugin : BaseUnityPlugin
+
+    public class KABase : BaseUnityPlugin //CONTAINS: ConfigMenu, Visuals, Spear proficiencies, Karma:Food:Stats system, and Crafting
     {
 
         private const string MOD_ID = "darkgran.karmaappetite";
 
+        //-------APPLY HOOKS-------
 
-        //-------CONFIG MENU-------
+        public void OnEnable()
+        {
+            
+            //Resources
+            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
+            //Config menu
+            On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit);
+
+            //Enums
+            KarmaAppetiteEnums.APOType.RegisterValues();
+
+            //Visuals
+            On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
+            On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
+            On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
+            On.SLOracleSwarmer.BitByPlayer += hook_SLOracleSwarmer_BitByPlayer;
+            //Appetite
+            On.Player.ThrownSpear += hook_Player_ThrownSpear;
+            On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
+            On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
+            On.Player.SetMalnourished += hook_Player_SetMalnourished;
+            On.Player.AddFood += hook_Player_AddFood;
+            On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
+            //Skills
+            On.Player.Update += hook_Player_Update;
+            On.Spear.ChangeMode += hook_Spear_ChangeMode;
+            On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
+            //Crafting
+            On.AbstractPhysicalObject.Realize += hook_AbstractPhysicalObject_Realize;
+
+            //Tunneling
+            KATunneling.KATunneling_Hooks();
+
+        }
+
+        public void OnDisable()
+        {
+            //Enums
+            KarmaAppetiteEnums.APOType.UnregisterValues();
+        }
+
+        private void LoadResources(RainWorld rainWorld) { }
+
+
+        //-------IMPLEMENTATION-------
+
+        //---CONFIG MENU---
 
         private OptionsMenu optionsMenuInstance;
         private bool initialized;
@@ -49,13 +97,13 @@ namespace KarmaAppetite
         }
 
 
-        //-------NEW ENUMS-------
+        //---ENUMS---
 
         public class KarmaAppetiteEnums
         {
             public class APOType
             {
-                public static AbstractPhysicalObject.AbstractObjectType SpearShard; //For rocks made out of spear (see Crafting)
+                public static AbstractPhysicalObject.AbstractObjectType SpearShard; //CRAFTING - "rocks made out of spear"
 
                 public static void RegisterValues()
                 {
@@ -70,59 +118,7 @@ namespace KarmaAppetite
         }
 
 
-        //-------APPLY HOOKS-------
-
-        
-
-        public void OnEnable()
-        {
-            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-            On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit); //config menu (above)
-
-            //Enums
-            KarmaAppetiteEnums.APOType.RegisterValues();
-
-            //KarmaAppetite
-            On.Player.Update += hook_Player_Update;
-            On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
-            On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
-            On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
-            On.SLOracleSwarmer.BitByPlayer += hook_SLOracleSwarmer_BitByPlayer;
-            On.Spear.ChangeMode += hook_Spear_ChangeMode;
-            On.Player.CanIPickThisUp += hook_Player_CanIPickThisUp;
-            On.Player.ThrownSpear += hook_Player_ThrownSpear;
-            On.HUD.FoodMeter.ctor += hook_FoodMeter_ctor;
-            On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
-            On.Player.SetMalnourished += hook_Player_SetMalnourished;
-            On.Player.AddFood += hook_Player_AddFood;
-            On.HUD.FoodMeter.QuarterPipShower.Update += hook_QuarterPipShower_Update;
-
-            //Crafting
-            On.AbstractPhysicalObject.Realize += hook_AbstractPhysicalObject_Realize;
-
-            //Tunneling
-            On.Player.MovementUpdate += hook_Player_MovementUpdate;
-            TunnelingHooksForHidingCarried();
-        }
-
-        public void OnDisable()
-        {
-            //Enums
-            KarmaAppetiteEnums.APOType.UnregisterValues();
-        }
-
-        private void LoadResources(RainWorld rainWorld) { }
-
-
-        //-------IMPLEMENTATION-------
-
-        private const int STARTING_MAX_KARMA = 6;
-        private const int DISLODGE_FOOD = 1; //food in stomach for dislodge
-        private const int FOOD_POTENTIAL = 14; //max food with max karma
-
         //---VISUALS---
-
-        
 
         private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
@@ -157,11 +153,11 @@ namespace KarmaAppetite
             sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
 
             //Tunneling
-            AnimateTunneling(self, sLeaser, rCam, timeStacker, camPos);
+            KATunneling.AnimateTunneling(self, sLeaser, rCam, timeStacker, camPos);
 
         }
 
-        private void RefreshGlow(Player self)
+        private static void RefreshGlow(Player self)
         {
             bool glowing = self.Karma + 1 > 4 && self.CurrentFood != 0;
             if (self.glowing != glowing)
@@ -208,69 +204,11 @@ namespace KarmaAppetite
         }
 
 
-        //---SKILLS---
-
-        private void hook_Player_Update(On.Player.orig_Update orig, Player self, bool eu)
-        {
-            orig.Invoke(self, eu);
-
-            CheckForTunneling(self, eu); //See below Crafting
-            if (!IsInTunnel)
-            {
-                CheckForCrafting(self, eu); //See below Appetite            
-            }
-            
-        }
-
-        private bool CanAffordPrice(Player self, int price, bool never_free=false)
-        {
-            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || (self.Karma >= STARTING_MAX_KARMA && !never_free);
-        }
-
-
-        //SPEAR PULL
-
-        private void hook_Spear_ChangeMode(On.Spear.orig_ChangeMode orig, Spear self, Weapon.Mode newMode)
-        {
-            if (self.mode == Weapon.Mode.StuckInWall && newMode != Weapon.Mode.StuckInWall)
-            {
-                if (self.abstractSpear.stuckInWallCycles >= 0)
-                {
-                    for (int i = -1; i < 3; i++)
-                    {
-                        self.room.GetTile(self.stuckInWall.Value + new UnityEngine.Vector2(20f * (float)i, 0f)).horizontalBeam = false;
-                    }
-                }
-                else
-                {
-                    for (int j = -1; j < 3; j++)
-                    {
-                        self.room.GetTile(self.stuckInWall.Value + new UnityEngine.Vector2(0f, 20f * (float)j)).verticalBeam = false;
-                    }
-                }
-                self.stuckInWall = null;
-                self.abstractSpear.stuckInWallCycles = 0;
-                self.addPoles = false;
-            }
-
-            orig.Invoke(self, newMode);
-
-        }
-
-        private bool hook_Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
-        {
-            bool orig_result = orig.Invoke(self, obj);
-
-            if (!orig_result && obj is Spear && (obj as Spear).mode == Weapon.Mode.StuckInWall)
-            {
-                return self.FoodInStomach >= DISLODGE_FOOD;
-            }
-
-            return orig_result;
-        }
-
         //---APPETITE---
 
+        private const int STARTING_MAX_KARMA = 6;
+        private const int DISLODGE_FOOD = 1; //food in stomach for dislodge
+        private const int FOOD_POTENTIAL = 14; //max food with max karma
 
         //REFRESH
 
@@ -324,7 +262,7 @@ namespace KarmaAppetite
             self.foodToHibernate = GetFoodFromKarma(karma).y;
         }
 
-        private void FoodToStats(SlugcatStats self, int food, bool extraStats)
+        private static void FoodToStats(SlugcatStats self, int food, bool extraStats)
         {
 
             if (!self.malnourished)
@@ -401,7 +339,7 @@ namespace KarmaAppetite
 
         //REMOVING FOOD POINTS
 
-        private void RemoveQuarterFood(Player self)
+        private static void RemoveQuarterFood(Player self)
         {
             if (self.playerState.quarterFoodPoints <= 0)
             {
@@ -433,6 +371,68 @@ namespace KarmaAppetite
                     self.owner.circles[self.owner.showCount].QuarterCirclePlop();
                 }
             }
+        }
+
+
+        //---SKILLS---
+
+        private void hook_Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        {
+            orig.Invoke(self, eu);
+
+            KATunneling.CheckForTunneling(self, eu); //See KATunneling
+            if (!KATunneling.IsInTunnel)
+            {
+                CheckForCrafting(self, eu); //See below Skills: Spear Pull
+            }
+
+        }
+
+        public static bool CanAffordPrice(Player self, int price, bool never_free = false)
+        {
+            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || (self.Karma >= STARTING_MAX_KARMA && !never_free);
+        }
+
+
+        //SPEAR PULL
+
+        private void hook_Spear_ChangeMode(On.Spear.orig_ChangeMode orig, Spear self, Weapon.Mode newMode)
+        {
+            if (self.mode == Weapon.Mode.StuckInWall && newMode != Weapon.Mode.StuckInWall)
+            {
+                if (self.abstractSpear.stuckInWallCycles >= 0)
+                {
+                    for (int i = -1; i < 3; i++)
+                    {
+                        self.room.GetTile(self.stuckInWall.Value + new UnityEngine.Vector2(20f * (float)i, 0f)).horizontalBeam = false;
+                    }
+                }
+                else
+                {
+                    for (int j = -1; j < 3; j++)
+                    {
+                        self.room.GetTile(self.stuckInWall.Value + new UnityEngine.Vector2(0f, 20f * (float)j)).verticalBeam = false;
+                    }
+                }
+                self.stuckInWall = null;
+                self.abstractSpear.stuckInWallCycles = 0;
+                self.addPoles = false;
+            }
+
+            orig.Invoke(self, newMode);
+
+        }
+
+        private bool hook_Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
+        {
+            bool orig_result = orig.Invoke(self, obj);
+
+            if (!orig_result && obj is Spear && (obj as Spear).mode == Weapon.Mode.StuckInWall)
+            {
+                return self.FoodInStomach >= DISLODGE_FOOD;
+            }
+
+            return orig_result;
         }
 
 
@@ -487,7 +487,7 @@ namespace KarmaAppetite
             return self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
         }
 
-        private void PayDay(Player self, int quarterPrice)
+        public static void PayDay(Player self, int quarterPrice)
         {
             if (self.Karma < STARTING_MAX_KARMA)
             {
@@ -869,228 +869,6 @@ namespace KarmaAppetite
                 pg.blink = 50;
             }
         }
-
-
-        //---TUNNELING / PATHFINDING---
-
-        private const int TUNNELING_FIND_TIME = 180;
-        private const int TUNNELING_PRICE = 0;
-        private const int TUNNELING_DISTANCE = 10;
-        private const int TUNNELING_ABORT_TIME = 100;
-        private int TunnelingCounter = 0;
-        private bool TunnelingLock = false;
-        private int TunnelingLockCounter = 0;
-        private int TunnelingAbortTimer = 0;
-        private bool IsInTunnel = false;
-        private IntVector2 TunnelDestination = new IntVector2(0, 0);
-        private UnityEngine.Vector2 InputDirection = new UnityEngine.Vector2(0, 0);
-
-        private void CheckForTunneling(Player self, bool eu) //called by hook_Player_Update
-        {
-            if (IsInTunnel)
-            {
-                TunnelingAbortTimer++;
-                IntVector2 currentPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
-                if (currentPos == TunnelDestination || TunnelingAbortTimer > TUNNELING_ABORT_TIME)
-                {
-                    self.abstractCreature.pos.Tile = currentPos;
-                    self.enteringShortCut = null;
-                    self.inShortcut = false;
-                    IsInTunnel = false;
-                }
-            }
-            else if (Input.GetKey(KeyCode.E) && CanTunnel(self) && !TunnelingLock)
-            {
-                TunnelingAbortTimer = 0;
-                TunnelingCounter++;
-                if (TunnelingCounter > TUNNELING_FIND_TIME)
-                {
-                    TunnelingLock = true;
-                    StartTunnel(self, eu);
-                    TunnelingCounter = 0;
-                }
-                else
-                {
-                    AnimateTunnelFind(self);
-                }
-            }
-            else
-            {
-                if (TunnelingAbortTimer > 0)
-                {
-                    TunnelingAbortTimer = 0;
-                }
-                if (TunnelingCounter > 0)
-                {
-                    TunnelingCounter = 0;
-                }
-            }
-            if (TunnelingLock && !IsInTunnel)
-            {
-                TunnelingLockCounter++;
-                if (TunnelingLockCounter == 80)
-                {
-                    TunnelingLock = false;
-                    TunnelingLockCounter = 0;
-                }
-            }
-        }
-
-        private bool CanTunnel(Player self)
-        {
-            return CanAffordPrice(self, TUNNELING_PRICE) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
-        }
-
-        private void hook_Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
-        {
-            if (IsInTunnel || TunnelingCounter > 0)
-            {
-                if (self.input[0].x != 0 || self.input[0].y != 0)
-                {
-                    InputDirection.x = self.input[0].x;
-                    InputDirection.y = self.input[0].y;
-                }
-                self.input[0].x = 0;
-                self.input[0].y = 0;
-            }
-            orig.Invoke(self, eu);
-        }
-
-        private void StartTunnel(Player self, bool eu)
-        {
-
-            IntVector2 direction = new IntVector2(1, 0);
-            if (InputDirection.y == 0)
-            {
-                if (InputDirection.x < 0)
-                {
-                    direction.x = -1;
-                }
-            }
-            else
-            {
-                direction.x = 0;
-                if (InputDirection.y < 0)
-                {
-                    direction.y = -1;
-                }
-                else
-                {
-                    direction.y = 1;
-                }
-            }
-
-            direction *= TUNNELING_DISTANCE;
-            IntVector2 startPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
-            TunnelDestination = startPos + direction;
-            
-            IsInTunnel = true;
-            self.inShortcut = true;
-            self.abstractCreature.pos.Tile = TunnelDestination;
-            self.enteringShortCut = TunnelDestination;
-
-        }
-
-        //TUNNELING ANIMATIONS
-
-        private void AnimateTunnelFind(Player self) //Pathfinding animation
-        {
-            if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
-            {
-                PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
-                if (TunnelingCounter % 50 == 0)
-                {
-                    pg.blink = 25;
-                }
-                pg.objectLooker.currentMostInteresting = self;
-                pg.head.vel += Custom.DirVec(pg.drawPositions[0, 0], pg.objectLooker.mostInterestingLookPoint);
-            }
-        }
-
-        private void AnimateTunneling(PlayerGraphics pg, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos) //In-Tunnel animation
-        {
-            for (int i = 0; i < sLeaser.sprites.Length; i++)
-            {
-                {
-                    if (IsInTunnel)
-                    {
-                        if (i != 11)
-                        {
-                            sLeaser.sprites[i].isVisible = false;
-                        }
-                        else
-                        {
-                            sLeaser.sprites[i].isVisible = true;
-                            sLeaser.sprites[i].x = pg.head.pos.x - camPos.x;
-                            sLeaser.sprites[i].y = pg.head.pos.y - camPos.y;
-                            sLeaser.sprites[i].alpha = 0.9f;
-                            if (InputDirection.y == 0)
-                            {
-                                sLeaser.sprites[i].scaleX = 14f;
-                                sLeaser.sprites[i].scaleY = 5f;
-                            }
-                            else
-                            {
-                                sLeaser.sprites[i].scaleX = 5f;
-                                sLeaser.sprites[i].scaleY = 14f;
-                            }
-                        }
-                    }
-                    else if ((i < 4 || i > 8) && i != 12 && i != 13 && i < 15)
-                    {
-                        sLeaser.sprites[i].isVisible = true;
-                        if (i == 11)
-                        {
-                            sLeaser.sprites[i].scale = 5f;
-                        }
-                    }
-                }
-            }
-        }
-
-        //TUNNELING: HIDE CARRIED
-
-        private void TunnelingHooksForHidingCarried()
-        {
-            On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
-            On.Rock.DrawSprites += hook_Rock_DrawSprites;
-        }
-
-        private void HideAllSpritesIfGrabbed(RoomCamera.SpriteLeaser sLeaser, PhysicalObject po, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos, List<int> exclude=null)
-        {
-            foreach (Creature.Grasp grabbedBy in po.grabbedBy)
-            {
-                if (grabbedBy.grabber is Player)
-                {
-                    for (int i = 0; i < sLeaser.sprites.Length; i++)
-                    {
-                        if (exclude == null || !exclude.Contains(i))
-                        {
-                            sLeaser.sprites[i].isVisible = !IsInTunnel;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
-        {
-            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self.owner, rCam, timeStacker, camPos);
-        }
-
-        private void hook_Rock_DrawSprites(On.Rock.orig_DrawSprites orig, Rock self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
-        {
-            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos, new List<int>{1});
-        }
-
-
-
-
-
-
-
 
     }
 }
