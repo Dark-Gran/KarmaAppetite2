@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Menu.Remix.MixedUI;
-using RWCustom;
 using UnityEngine;
 
 namespace KarmaAppetite
 {
 
-    public class OptionsMenu : OptionInterface
+    public class KAOptions : OptionInterface
     {
 
         public readonly Configurable<bool> testCheckBox;
 
-        public OptionsMenu(KarmaAppetite.KABase plugin)
+        public KAOptions(KarmaAppetite.KABase plugin)
         {
             this.testCheckBox = this.config.Bind<bool>("KarmaAppetite_TestCheckBox", true, new ConfigurableInfo(null));
         }

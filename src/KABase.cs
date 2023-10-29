@@ -69,7 +69,7 @@ namespace KarmaAppetite
 
         //---CONFIG MENU---
 
-        private OptionsMenu optionsMenuInstance;
+        private KAOptions optionsInstance;
         private bool initialized;
 
         public void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
@@ -80,14 +80,14 @@ namespace KarmaAppetite
                 return;
             }
             this.initialized = true;
-            this.optionsMenuInstance = new OptionsMenu(this);
+            this.optionsInstance = new KAOptions(this);
             try
             {
-                MachineConnector.SetRegisteredOI(MOD_ID, this.optionsMenuInstance);
+                MachineConnector.SetRegisteredOI(MOD_ID, this.optionsInstance);
             }
             catch (Exception ex)
             {
-                Debug.Log(string.Format("Karma Appetite Options: Hook_OnModsInit options failed init error {0}{1}", this.optionsMenuInstance, ex));
+                Debug.Log(string.Format("Karma Appetite Options: Hook_OnModsInit options failed init error {0}{1}", this.optionsInstance, ex));
                 base.Logger.LogError(ex);
                 base.Logger.LogMessage("OOPS");
             }
