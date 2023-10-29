@@ -35,7 +35,6 @@ namespace KarmaAppetite
             //Visuals
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.PlayerProgression.SaveToDisk += hook_PlayerProgression_SaveToDisk;
-            On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
             On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
             On.SLOracleSwarmer.BitByPlayer += hook_SLOracleSwarmer_BitByPlayer;
             //Appetite
@@ -164,22 +163,36 @@ namespace KarmaAppetite
 
         private bool hook_PlayerProgression_SaveToDisk(On.PlayerProgression.orig_SaveToDisk orig, PlayerProgression self, bool saveCurrentState, bool saveMaps, bool saveMiscProg)
         {
-            /*if (saveCurrentState && self.currentSaveState != null)
+            if (saveCurrentState && self.currentSaveState != null)
             {
                 self.currentSaveState.theGlow = ShouldGlow(self.currentSaveState.deathPersistentSaveData.karma, self.currentSaveState.food);
-            }*/
+            }
             return orig.Invoke(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 
         private static void RefreshGlow(Player self)
         {
-           /* bool glowing = ShouldGlow(self.Karma, self.CurrentFood);
+            bool glowing = ShouldGlow(self.Karma, self.CurrentFood);
             if (self.glowing != glowing)
             {
                 self.glowing = glowing;
-                if (!glowing && self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
+                (self.State as PlayerNPCState).Glowing = true;
+                if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
                 {
-                    ((PlayerGraphics)self.graphicsModule).lightSource.Destroy();
+                    /*PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
+                    if (!glowing)
+                    {
+                        ((PlayerGraphics)self.graphicsModule).lightSource.Destroy();
+                    }
+                    else if (pg.lightSource == null){
+                        pg.lightSource = new LightSource(self.mainBodyChunk.pos, false, new Color(1f, 1f, 1f), self);
+                        pg.lightSource.requireUpKeep = true;
+                        pg.lightSource.submersible = true;
+                        pg.lightSource.setRad = new float?(300f);
+                        pg.lightSource.setAlpha = new float?(1f);
+                        self.room.AddObject(pg.lightSource);
+                    }*/
+                    
                 }
                 if (self.room != null)
                 {
@@ -188,27 +201,12 @@ namespace KarmaAppetite
                         (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
                     }
                 }
-            }*/
+            }
         }
 
         private static bool ShouldGlow(int karma, int food)
         {
-            return true;
-            return karma >= 4 && food != 0;
-        }
-
-        private void hook_LightSource_ApplyPalette(On.LightSource.orig_ApplyPalette orig, LightSource self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
-        {
-            orig.Invoke(self, sLeaser, rCam, palette);
-
-            /*if (self.tiedToObject is Player)
-            {
-                if (SlugBase.Features.PlayerFeatures.SlugcatColor.TryGet((self.tiedToObject as Player), out var c))
-                {
-                    self.color = c;
-                }
-                
-            }*/
+            return karma >= KABase.STARTING_MAX_KARMA && food != 0;
         }
 
         private void hook_OracleSwarmer_BitByPlayer(On.OracleSwarmer.orig_BitByPlayer orig, OracleSwarmer self, Creature.Grasp grasp, bool eu)
@@ -231,6 +229,15 @@ namespace KarmaAppetite
         private const int FOOD_POTENTIAL = 14; //max food with max karma
 
         //REFRESH
+
+        private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
+        {
+            orig.Invoke(self, saveStateNumber, game);
+            KarmaToFood(self.characterStats, self.saveState.deathPersistentSaveData.karma);
+            FoodToStats(self.characterStats, self.saveState.food, self.saveState.deathPersistentSaveData.karma >= 9);
+            self.saveState.theGlow = ShouldGlow(self.saveState.deathPersistentSaveData.karma, self.saveState.food);
+            RefreshAllPlayers(self);
+        }
 
         private void RefreshAllPlayers(StoryGameSession session)
         {
@@ -324,13 +331,6 @@ namespace KarmaAppetite
         }
 
         //FOOD METER
-
-        private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
-        {
-            orig.Invoke(self, saveStateNumber, game);
-            KarmaToFood(self.characterStats, self.saveState.deathPersistentSaveData.karma);
-            FoodToStats(self.characterStats, self.saveState.food, self.saveState.deathPersistentSaveData.karma >= 9);
-        }
 
         private void hook_FoodMeter_ctor(On.HUD.FoodMeter.orig_ctor orig, HUD.FoodMeter self, HUD.HUD hud, int maxFood, int survivalLimit, Player associatedPup = null, int pupNumber = 0)
         {
