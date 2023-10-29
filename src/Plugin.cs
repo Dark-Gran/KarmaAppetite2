@@ -171,33 +171,7 @@ namespace KarmaAppetite
             sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
 
             //Tunneling
-            for (int i = 0; i < sLeaser.sprites.Length; i++)
-            {
-                {
-                    if (IsInTunnel)
-                    {
-                        if (i != 11)
-                        {
-                            sLeaser.sprites[i].isVisible = false;
-                        }
-                        else
-                        {
-                            sLeaser.sprites[i].isVisible = true;
-                            sLeaser.sprites[i].x = self.head.pos.x - camPos.x;
-                            sLeaser.sprites[i].y = self.head.pos.y - camPos.y;
-                            sLeaser.sprites[i].scale = TUNNEL_MARK_SIZE;
-                        }
-                    }
-                    else if ((i < 4 || i > 8) && i != 12 && i != 13 && i < 15)
-                    {
-                        sLeaser.sprites[i].isVisible = true;
-                        if (i == 11)
-                        {
-                            sLeaser.sprites[i].scale = 5f;
-                        }
-                    }
-                }
-            }
+            AnimateTunneling(self, sLeaser, rCam, timeStacker, camPos);
 
         }
 
@@ -916,7 +890,6 @@ namespace KarmaAppetite
         private const int TUNNELING_TIME = 180;
         private const int TUNNELING_PRICE = 0;
         private const int TUNNELING_DISTANCE = 10;
-        private const float TUNNEL_MARK_SIZE = 8.5f;
         private int TunnelingCounter = 0;
         private bool TunnelingLock = false;
         private int TunnelingLockCounter = 0;
@@ -974,10 +947,13 @@ namespace KarmaAppetite
         {
             if (IsInTunnel || TunnelingCounter > 0)
             {
-                InputDirection.x = self.input[0].x;
-                InputDirection.y = self.input[0].y;
+                if (self.input[0].x != 0 || self.input[0].y != 0)
+                {
+                    InputDirection.x = self.input[0].x;
+                    InputDirection.y = self.input[0].y;
+                }
                 self.input[0].x = 0;
-                self.input[0].y = 0;    
+                self.input[0].y = 0;
             }
             orig.Invoke(self, eu);
         }
@@ -1030,6 +1006,47 @@ namespace KarmaAppetite
                 }
                 pg.objectLooker.currentMostInteresting = self;
                 pg.head.vel += Custom.DirVec(pg.drawPositions[0, 0], pg.objectLooker.mostInterestingLookPoint);
+            }
+        }
+
+        private void AnimateTunneling(PlayerGraphics pg, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos) //In-Tunnel animation
+        {
+            for (int i = 0; i < sLeaser.sprites.Length; i++)
+            {
+                {
+                    if (IsInTunnel)
+                    {
+                        if (i != 11)
+                        {
+                            sLeaser.sprites[i].isVisible = false;
+                        }
+                        else
+                        {
+                            sLeaser.sprites[i].isVisible = true;
+                            sLeaser.sprites[i].x = pg.head.pos.x - camPos.x;
+                            sLeaser.sprites[i].y = pg.head.pos.y - camPos.y;
+                            sLeaser.sprites[i].alpha = 0.9f;
+                            if (InputDirection.y == 0)
+                            {
+                                sLeaser.sprites[i].scaleX = 14f;
+                                sLeaser.sprites[i].scaleY = 5f;
+                            }
+                            else
+                            {
+                                sLeaser.sprites[i].scaleX = 5f;
+                                sLeaser.sprites[i].scaleY = 14f;
+                            }
+                        }
+                    }
+                    else if ((i < 4 || i > 8) && i != 12 && i != 13 && i < 15)
+                    {
+                        sLeaser.sprites[i].isVisible = true;
+                        if (i == 11)
+                        {
+                            sLeaser.sprites[i].scale = 5f;
+                        }
+                    }
+                }
             }
         }
 
