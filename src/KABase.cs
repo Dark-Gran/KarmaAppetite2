@@ -164,16 +164,16 @@ namespace KarmaAppetite
 
         private bool hook_PlayerProgression_SaveToDisk(On.PlayerProgression.orig_SaveToDisk orig, PlayerProgression self, bool saveCurrentState, bool saveMaps, bool saveMiscProg)
         {
-            if (saveCurrentState && self.currentSaveState != null)
+            /*if (saveCurrentState && self.currentSaveState != null)
             {
                 self.currentSaveState.theGlow = ShouldGlow(self.currentSaveState.deathPersistentSaveData.karma, self.currentSaveState.food);
-            }
+            }*/
             return orig.Invoke(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 
         private static void RefreshGlow(Player self)
         {
-            bool glowing = ShouldGlow(self.Karma, self.CurrentFood);
+           /* bool glowing = ShouldGlow(self.Karma, self.CurrentFood);
             if (self.glowing != glowing)
             {
                 self.glowing = glowing;
@@ -188,11 +188,12 @@ namespace KarmaAppetite
                         (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
                     }
                 }
-            }
+            }*/
         }
 
         private static bool ShouldGlow(int karma, int food)
         {
+            return true;
             return karma >= 4 && food != 0;
         }
 
@@ -200,14 +201,14 @@ namespace KarmaAppetite
         {
             orig.Invoke(self, sLeaser, rCam, palette);
 
-            if (self.tiedToObject is Player)
+            /*if (self.tiedToObject is Player)
             {
                 if (SlugBase.Features.PlayerFeatures.SlugcatColor.TryGet((self.tiedToObject as Player), out var c))
                 {
                     self.color = c;
                 }
                 
-            }
+            }*/
         }
 
         private void hook_OracleSwarmer_BitByPlayer(On.OracleSwarmer.orig_BitByPlayer orig, OracleSwarmer self, Creature.Grasp grasp, bool eu)
@@ -582,9 +583,10 @@ namespace KarmaAppetite
                         PayDay(self, 1);
                         break;
                     }
-                    if (physicalObject is SlimeMold && physicalObject2 is DangleFruit) //Slimemold + Dangle = Lantern
+                    if ((physicalObject is SlimeMold || physicalObject is JellyFish || physicalObject is OverseerCarcass || physicalObject is OracleSwarmer || physicalObject is FlareBomb) && (physicalObject2 is DangleFruit || physicalObject2 is WaterNut || physicalObject2 is SwollenWaterNut) && CanAffordPrice(self, 1)) //Slimemold/JellyFish/Overseer/Neuron/Flashbang + Dangle/Waternut = Lantern
                     {
                         newItem = SpawnObject(self, AbstractPhysicalObject.AbstractObjectType.Lantern, room, self.abstractCreature.pos, "");
+                        PayDay(self, 1);
                         break;
                     }
                     if (physicalObject is VultureGrub && physicalObject2 is DangleFruit && CanAffordPrice(self, 1)) //VultureWorm + Dangle = GrappleWorm
@@ -618,7 +620,7 @@ namespace KarmaAppetite
                         PayDay(self, 4);
                         break;
                     }
-                    if (self.Karma >= 9 && ((physicalObject is SSOracleSwarmer && physicalObject2 is SSOracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordPrice(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
+                    if (self.Karma >= 9 && ((physicalObject is OracleSwarmer && physicalObject2 is OracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordPrice(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
                     {
                         newItem = SpawnObject(self, MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
