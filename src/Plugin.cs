@@ -101,7 +101,8 @@ namespace KarmaAppetite
             On.AbstractPhysicalObject.Realize += hook_AbstractPhysicalObject_Realize;
 
             //Tunneling
-            TunnelingHooks();
+            On.Player.MovementUpdate += hook_Player_MovementUpdate;
+            TunnelingHooksForHidingCarried();
         }
 
         public void OnDisable()
@@ -835,9 +836,9 @@ namespace KarmaAppetite
             if (self.graphicsModule != null && (self.grasps[0] != null || self.grasps[1] != null) && self.graphicsModule is PlayerGraphics)
             {
                 PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
-                if (CraftingCounter % 40 == 0)
+                if (CraftingCounter % 50 == 0)
                 {
-                    pg.blink = 20;
+                    pg.blink = 25;
                 }
                 if (self.grasps[0] != null && self.grasps[1] != null)
                 {
@@ -1047,29 +1048,46 @@ namespace KarmaAppetite
             }
         }
 
+        //TUNNELING: HIDE CARRIED
 
-        //todo (tunneling: hide carried)
-
-        private void TunnelingHooks()
+        private void TunnelingHooksForHidingCarried()
         {
-            //On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
-            On.Player.MovementUpdate += hook_Player_MovementUpdate;
+            On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
+            On.Rock.DrawSprites += hook_Rock_DrawSprites;
         }
 
-        private void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        private void HideAllSpritesIfGrabbed(RoomCamera.SpriteLeaser sLeaser, PhysicalObject po, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos, List<int> exclude=null)
         {
-            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            foreach (Creature.Grasp grabbedBy in self.owner.grabbedBy)
+            foreach (Creature.Grasp grabbedBy in po.grabbedBy)
             {
                 if (grabbedBy.grabber is Player)
                 {
                     for (int i = 0; i < sLeaser.sprites.Length; i++)
                     {
-                        sLeaser.sprites[i].isVisible = !IsInTunnel;
+                        if (exclude == null || !exclude.Contains(i))
+                        {
+                            sLeaser.sprites[i].isVisible = !IsInTunnel;
+                        }
                     }
                 }
             }
         }
+
+        private void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideAllSpritesIfGrabbed(sLeaser, self.owner, rCam, timeStacker, camPos);
+        }
+
+        private void hook_Rock_DrawSprites(On.Rock.orig_DrawSprites orig, Rock self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            HideAllSpritesIfGrabbed(sLeaser, self, rCam, timeStacker, camPos, new List<int>{1});
+        }
+
+
+
+
 
 
 
