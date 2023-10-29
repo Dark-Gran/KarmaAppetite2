@@ -169,6 +169,7 @@ namespace KarmaAppetite
             }
         }
 
+        //SLUGCAT HIDE
         public static void AnimateTunneling(PlayerGraphics pg, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos) //called by KABase.hook_PlayerGraphics_DrawSprites
         {
             for (int i = 0; i < sLeaser.sprites.Length; i++)
@@ -261,13 +262,26 @@ namespace KarmaAppetite
             {
                 if (grabbedBy.grabber is Player)
                 {
-                    for (int i = 0; i < sLeaser.sprites.Length; i++)
-                    {
-                        if (exclude == null || !exclude.Contains(i))
-                        {
-                            sLeaser.sprites[i].isVisible = !IsInTunnel;
-                        }
-                    }
+                    ChangeSpritesVisibility(sLeaser, !IsInTunnel, exclude);
+                    break;
+                }
+            }
+            if (po is Spear)
+            {
+                if ((po as Spear).onPlayerBack)
+                {
+                    ChangeSpritesVisibility(sLeaser, !IsInTunnel, exclude);
+                }
+            }
+        }
+
+        private static void ChangeSpritesVisibility(RoomCamera.SpriteLeaser sLeaser, bool visibility, List<int> exclude = null)
+        {
+            for (int i = 0; i < sLeaser.sprites.Length; i++)
+            {
+                if (exclude == null || !exclude.Contains(i))
+                {
+                    sLeaser.sprites[i].isVisible = visibility;
                 }
             }
         }
