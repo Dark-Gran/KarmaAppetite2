@@ -149,6 +149,13 @@ namespace KarmaAppetite
 
             sLeaser.sprites[3].element = Futile.atlasManager.GetElementWithName("HeadB" + hair_num.ToString());
 
+            //Golden eyes on Karma10
+
+            if (self.owner is Player && (self.owner as Player).Karma >= 9)
+            {
+                sLeaser.sprites[9].color = new Color(0.976f, 0.584f, 0f);
+            }
+
             //Tunneling
             KATunneling.AnimateTunneling(self, sLeaser, rCam, timeStacker, camPos);
 
