@@ -10,7 +10,6 @@
 
 		"back_spear": true,
 		"the_mark": true,
-		"start_room": "SU_A24",
 		"has_dreams": true,
 		"use_default_dreams": false,
 		"world_state": [ "Rivulet", "Red" ],

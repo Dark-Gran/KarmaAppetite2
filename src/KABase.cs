@@ -322,6 +322,10 @@ namespace KarmaAppetite
         private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
         {
             orig.Invoke(self, saveStateNumber, game);
+            if (self.saveState.deathPersistentSaveData.karmaCap < STARTING_MAX_KARMA)
+            {
+                self.saveState.deathPersistentSaveData.karmaCap = STARTING_MAX_KARMA;
+            }
             KarmaToFood(self.characterStats, self.saveState.deathPersistentSaveData.karma);
             FoodToStats(self.characterStats, self.saveState.food, self.saveState.deathPersistentSaveData.karma >= 9);
         }
