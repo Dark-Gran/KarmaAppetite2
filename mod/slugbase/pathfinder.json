@@ -10,6 +10,7 @@
 
 		"back_spear": true,
 		"karma": 6,
+		"karma_cap":  6,
 		"the_mark": true,
 		"has_dreams": true,
 		"use_default_dreams": false,

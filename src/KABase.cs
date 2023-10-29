@@ -166,14 +166,14 @@ namespace KarmaAppetite
         {
             if (saveCurrentState && self.currentSaveState != null)
             {
-                self.currentSaveState.theGlow = self.currentSaveState.deathPersistentSaveData.karma + 1 > 4 && self.currentSaveState.food != 0;
+                self.currentSaveState.theGlow = ShouldGlow(self.currentSaveState.deathPersistentSaveData.karma, self.currentSaveState.food);
             }
             return orig.Invoke(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 
         private static void RefreshGlow(Player self)
         {
-            bool glowing = self.Karma + 1 > 4 && self.CurrentFood != 0;
+            bool glowing = ShouldGlow(self.Karma, self.CurrentFood);
             if (self.glowing != glowing)
             {
                 self.glowing = glowing;
@@ -189,6 +189,11 @@ namespace KarmaAppetite
                     }
                 }
             }
+        }
+
+        private static bool ShouldGlow(int karma, int food)
+        {
+            return karma >= 4 && food != 0;
         }
 
         private void hook_LightSource_ApplyPalette(On.LightSource.orig_ApplyPalette orig, LightSource self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
