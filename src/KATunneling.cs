@@ -177,7 +177,7 @@ namespace KarmaAppetite
 
         //SLUGCAT HIDE
 
-        private const int TUNNEL_SHOW_TIME = 14; //in-tunnel blinking
+        private const int TUNNEL_SHOW_TIME = 16; //in-tunnel blinking
         private const int TUNNEL_HIDE_TIME = 10;
         private static int blinkingCounter = 0;
         private static bool tunnelShow = true;
