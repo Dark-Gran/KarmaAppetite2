@@ -34,6 +34,7 @@ namespace KarmaAppetite
 
             //Visuals
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
+            On.PlayerProgression.SaveToDisk += hook_PlayerProgression_SaveToDisk;
             On.LightSource.ApplyPalette += hook_LightSource_ApplyPalette;
             On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
             On.SLOracleSwarmer.BitByPlayer += hook_SLOracleSwarmer_BitByPlayer;
@@ -159,6 +160,15 @@ namespace KarmaAppetite
             //Tunneling
             KATunneling.AnimateTunneling(self, sLeaser, rCam, timeStacker, camPos);
 
+        }
+
+        private bool hook_PlayerProgression_SaveToDisk(On.PlayerProgression.orig_SaveToDisk orig, PlayerProgression self, bool saveCurrentState, bool saveMaps, bool saveMiscProg)
+        {
+            if (saveCurrentState && self.currentSaveState != null)
+            {
+                self.currentSaveState.theGlow = self.currentSaveState.deathPersistentSaveData.karma + 1 > 4 && self.currentSaveState.food != 0;
+            }
+            return orig.Invoke(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 
         private static void RefreshGlow(Player self)
