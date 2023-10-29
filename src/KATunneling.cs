@@ -8,6 +8,7 @@ using RWCustom;
 using UnityEngine;
 using SlugBase.Features;
 using MoreSlugcats;
+using SlugBase.DataTypes;
 
 namespace KarmaAppetite
 {
@@ -39,6 +40,7 @@ namespace KarmaAppetite
         public static bool IsInTunnel = false;
         private static IntVector2 TunnelDestination = new IntVector2(0, 0);
         private static UnityEngine.Vector2 InputDirection = new UnityEngine.Vector2(0, 0);
+
 
         //INPUT
 
@@ -117,6 +119,7 @@ namespace KarmaAppetite
 
         private static void StartTunnel(Player self, bool eu)
         {
+            blinkingCounter = 0;
 
             IntVector2 direction = new IntVector2(1, 0);
             if (InputDirection.y == 0)
@@ -170,8 +173,15 @@ namespace KarmaAppetite
         }
 
         //SLUGCAT HIDE
+
+        private const int TUNNEL_SHOW_TIME = 14; //in-tunnel blinking
+        private const int TUNNEL_HIDE_TIME = 10;
+        private static int blinkingCounter = 0;
+        private static bool tunnelShow = true;
+        
         public static void AnimateTunneling(PlayerGraphics pg, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos) //called by KABase.hook_PlayerGraphics_DrawSprites
         {
+            blinkingCounter++;
             for (int i = 0; i < sLeaser.sprites.Length; i++)
             {
                 {
@@ -183,19 +193,24 @@ namespace KarmaAppetite
                         }
                         else
                         {
-                            sLeaser.sprites[i].isVisible = true;
+                            if ((tunnelShow && blinkingCounter >= TUNNEL_SHOW_TIME) || (!tunnelShow && blinkingCounter >= TUNNEL_HIDE_TIME))
+                            {
+                                tunnelShow = !tunnelShow;
+                                blinkingCounter = 0;
+                            }
+                            sLeaser.sprites[i].isVisible = tunnelShow;
                             sLeaser.sprites[i].x = pg.head.pos.x - camPos.x;
                             sLeaser.sprites[i].y = pg.head.pos.y - camPos.y;
                             sLeaser.sprites[i].alpha = 0.9f;
                             if (InputDirection.y == 0)
                             {
-                                sLeaser.sprites[i].scaleX = 14f;
-                                sLeaser.sprites[i].scaleY = 4f;
+                                sLeaser.sprites[i].scaleX = 12f;
+                                sLeaser.sprites[i].scaleY = 6f;
                             }
                             else
                             {
-                                sLeaser.sprites[i].scaleX = 4f;
-                                sLeaser.sprites[i].scaleY = 14f;
+                                sLeaser.sprites[i].scaleX = 6f;
+                                sLeaser.sprites[i].scaleY = 12f;
                             }
                         }
                     }
