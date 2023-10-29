@@ -30,7 +30,7 @@ namespace KarmaAppetite
         //---FUNCTIONALITY---
 
         private const int TUNNELING_FIND_TIME = 180;
-        private const int TUNNELING_PRICE = 0;
+        private const int TUNNELING_PRICE = 4;
         private const int TUNNELING_DISTANCE = 10;
         private const int TUNNELING_ABORT_TIME = 100;
         private static int TunnelingCounter = 0;
@@ -150,6 +150,9 @@ namespace KarmaAppetite
             self.inShortcut = true;
             self.abstractCreature.pos.Tile = TunnelDestination;
             self.enteringShortCut = TunnelDestination;
+
+
+            KABase.PayDay(self, TUNNELING_PRICE);
 
         }
 

@@ -220,7 +220,7 @@ namespace KarmaAppetite
 
         //---APPETITE---
 
-        private const int STARTING_MAX_KARMA = 6;
+        public const int STARTING_MAX_KARMA = 6;
         private const int DISLODGE_FOOD = 1; //food in stomach for dislodge
         private const int FOOD_POTENTIAL = 14; //max food with max karma
 
@@ -402,9 +402,9 @@ namespace KarmaAppetite
 
         }
 
-        public static bool CanAffordPrice(Player self, int price, bool never_free = false)
+        public static bool CanAffordPrice(Player self, int price, bool neverFree = false)
         {
-            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || (self.Karma >= STARTING_MAX_KARMA && !never_free);
+            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || (self.Karma >= STARTING_MAX_KARMA && !neverFree);
         }
 
 
@@ -501,9 +501,9 @@ namespace KarmaAppetite
             return self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
         }
 
-        public static void PayDay(Player self, int quarterPrice)
+        public static void PayDay(Player self, int quarterPrice, bool neverFree=false)
         {
-            if (self.Karma < STARTING_MAX_KARMA)
+            if (self.Karma < STARTING_MAX_KARMA || neverFree)
             {
                 for (int i = 0; i < quarterPrice; i++)
                 {
