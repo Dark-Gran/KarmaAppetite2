@@ -101,8 +101,7 @@ namespace KarmaAppetite
             On.AbstractPhysicalObject.Realize += hook_AbstractPhysicalObject_Realize;
 
             //Tunneling
-            //On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
-            On.Player.MovementUpdate += hook_Player_MovementUpdate;
+            TunnelingHooks();
         }
 
         public void OnDisable()
@@ -122,21 +121,7 @@ namespace KarmaAppetite
 
         //---VISUALS---
 
-        //commented out because it does not work universally, some objects/parts remain visible (for some reason)
-        /*private void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
-        {
-            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            foreach (Creature.Grasp grabbedBy in self.owner.grabbedBy)
-            {
-                if (grabbedBy.grabber is Player)
-                {
-                    for (int i = 0; i < sLeaser.sprites.Length; i++)
-                    {
-                        sLeaser.sprites[i].isVisible = !IsInTunnel;
-                    }
-                }
-            }
-        }*/
+        
 
         private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
@@ -887,12 +872,14 @@ namespace KarmaAppetite
 
         //---TUNNELING / PATHFINDING---
 
-        private const int TUNNELING_TIME = 180;
+        private const int TUNNELING_FIND_TIME = 180;
         private const int TUNNELING_PRICE = 0;
         private const int TUNNELING_DISTANCE = 10;
+        private const int TUNNELING_ABORT_TIME = 100;
         private int TunnelingCounter = 0;
         private bool TunnelingLock = false;
         private int TunnelingLockCounter = 0;
+        private int TunnelingAbortTimer = 0;
         private bool IsInTunnel = false;
         private IntVector2 TunnelDestination = new IntVector2(0, 0);
         private UnityEngine.Vector2 InputDirection = new UnityEngine.Vector2(0, 0);
@@ -901,9 +888,11 @@ namespace KarmaAppetite
         {
             if (IsInTunnel)
             {
+                TunnelingAbortTimer++;
                 IntVector2 currentPos = new IntVector2(self.abstractCreature.pos.x, self.abstractCreature.pos.y);
-                if (currentPos == TunnelDestination)
+                if (currentPos == TunnelDestination || TunnelingAbortTimer > TUNNELING_ABORT_TIME)
                 {
+                    self.abstractCreature.pos.Tile = currentPos;
                     self.enteringShortCut = null;
                     self.inShortcut = false;
                     IsInTunnel = false;
@@ -911,8 +900,9 @@ namespace KarmaAppetite
             }
             else if (Input.GetKey(KeyCode.E) && CanTunnel(self) && !TunnelingLock)
             {
+                TunnelingAbortTimer = 0;
                 TunnelingCounter++;
-                if (TunnelingCounter > TUNNELING_TIME)
+                if (TunnelingCounter > TUNNELING_FIND_TIME)
                 {
                     TunnelingLock = true;
                     StartTunnel(self, eu);
@@ -923,9 +913,16 @@ namespace KarmaAppetite
                     AnimateTunnelFind(self);
                 }
             }
-            else if (TunnelingCounter > 0)
+            else
             {
-                TunnelingCounter = 0;
+                if (TunnelingAbortTimer > 0)
+                {
+                    TunnelingAbortTimer = 0;
+                }
+                if (TunnelingCounter > 0)
+                {
+                    TunnelingCounter = 0;
+                }
             }
             if (TunnelingLock && !IsInTunnel)
             {
@@ -1049,6 +1046,33 @@ namespace KarmaAppetite
                 }
             }
         }
+
+
+        //todo (tunneling: hide carried)
+
+        private void TunnelingHooks()
+        {
+            //On.GraphicsModule.DrawSprites += hook_GraphicsModule_DrawSprites;
+            On.Player.MovementUpdate += hook_Player_MovementUpdate;
+        }
+
+        private void hook_GraphicsModule_DrawSprites(On.GraphicsModule.orig_DrawSprites orig, GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            foreach (Creature.Grasp grabbedBy in self.owner.grabbedBy)
+            {
+                if (grabbedBy.grabber is Player)
+                {
+                    for (int i = 0; i < sLeaser.sprites.Length; i++)
+                    {
+                        sLeaser.sprites[i].isVisible = !IsInTunnel;
+                    }
+                }
+            }
+        }
+
+
+
 
     }
 }
