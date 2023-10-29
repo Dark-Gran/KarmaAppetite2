@@ -9,6 +9,7 @@
 		"select_menu_scene_ascended": "Ghost_Pathfinder",
 
 		"back_spear": true,
+		"karma": 6,
 		"the_mark": true,
 		"has_dreams": true,
 		"use_default_dreams": false,
