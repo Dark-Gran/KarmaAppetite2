@@ -311,17 +311,17 @@ namespace KarmaAppetite
             {
                 self.throwingSkill = (food > 0) ? 2 : 0;
 
-                float statBonus = food * ((extraStats) ? 0.08f : 0.04f);
+                float statBonus = food * ((extraStats) ? 0.06f : 0.03f);
 
                 const float STAT_BASE = 0.88f;
-                self.runspeedFac = STAT_BASE - 0.05f + statBonus;
+                self.runspeedFac = STAT_BASE - 0.04f + statBonus;
                 self.poleClimbSpeedFac = STAT_BASE + statBonus;
                 self.corridorClimbSpeedFac = STAT_BASE + statBonus;
                 self.lungsFac = STAT_BASE + statBonus * 5f;
 
-                self.generalVisibilityBonus = 0f + statBonus / 10f;
-                self.loudnessFac = 1.43f - statBonus / 2f;
-                self.visualStealthInSneakMode = 0.11f + statBonus / 2f;
+                self.generalVisibilityBonus = statBonus / 10f;
+                self.loudnessFac = 1.41f - statBonus / 2f;
+                self.visualStealthInSneakMode = 0.12f + statBonus / 2f;
                 self.bodyWeightFac -= statBonus / 2f;
             }
             else
@@ -340,7 +340,7 @@ namespace KarmaAppetite
             orig.Invoke(self, spear);
             spear.spearDamageBonus = 0.25f + ((self.playerState.foodInStomach / (FOOD_POTENTIAL / 10)) * ((self.Karma >= 9) ? 1f : 0.5f));
             BodyChunk firstChunk2 = spear.firstChunk;
-            float speedBoost = 0.73f + (self.playerState.foodInStomach / 10);
+            float speedBoost = 0.73f + (self.playerState.foodInStomach / 12);
             if (speedBoost < 1f && self.playerState.foodInStomach > 0) { speedBoost = 1f; }
             firstChunk2.vel.x = firstChunk2.vel.x * speedBoost;
         }
