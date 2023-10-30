@@ -21,6 +21,8 @@ namespace KarmaAppetite
 
         //-------APPLY HOOKS-------
 
+        private KAWorld kaWorldInstance = new KAWorld();
+
         public void OnEnable()
         {
 
@@ -55,7 +57,7 @@ namespace KarmaAppetite
             KATunneling.KATunneling_Hooks();
 
             //World/Story
-            KAWorld.KAWorld_Hooks();
+            kaWorldInstance.KAWorld_Hooks();
 
         }
 
