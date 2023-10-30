@@ -97,7 +97,7 @@ namespace KarmaAppetite
 
         private static bool CanTunnel(Player self)
         {
-            return (KABase.optionsInstance.freeTunnels.Value || KABase.CanAffordPrice(self, TUNNELING_PRICE)) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
+            return !self.room.IsGateRoom() && (KABase.optionsInstance.freeTunnels.Value || KABase.CanAffordPrice(self, TUNNELING_PRICE)) && self.Consious && self.swallowAndRegurgitateCounter == 0f && self.sleepCurlUp == 0f && self.spearOnBack.counter == 0f && (self.graphicsModule is PlayerGraphics && (self.graphicsModule as PlayerGraphics).throwCounter == 0f) && Custom.DistLess(self.mainBodyChunk.pos, self.mainBodyChunk.lastPos, 1.0f);
         }
 
         private static void hook_Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)

@@ -17,6 +17,8 @@
 		"start_room": "SU_A24",
 		"has_dreams": true,
 		"use_default_dreams": false,
+		"cycle_length_min": 4.5,
+		"cycle_length_max": 9.0,
 		"world_state": [ "Rivulet", "Red" ],
 		"timeline_before": [ "Saint" ],
 		"timeline_after": [ "Rivulet", "Red" ],
