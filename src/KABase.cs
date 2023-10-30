@@ -54,6 +54,9 @@ namespace KarmaAppetite
             //Tunneling
             KATunneling.KATunneling_Hooks();
 
+            //World/Story
+            KAWorld.KAWorld_Hooks();
+
         }
 
         public void OnDisable()
@@ -312,12 +315,12 @@ namespace KarmaAppetite
                 self.runspeedFac = STAT_BASE - 0.05f + statBonus;
                 self.poleClimbSpeedFac = STAT_BASE + statBonus;
                 self.corridorClimbSpeedFac = STAT_BASE + statBonus;
-                self.lungsFac = 2f + STAT_BASE + statBonus;
+                self.lungsFac = STAT_BASE + statBonus * 5f;
 
-                self.generalVisibilityBonus = 0f + statBonus / 10;
-                self.loudnessFac = 1.43f - statBonus / 2;
-                self.visualStealthInSneakMode = 0.11f + statBonus / 2;
-                self.bodyWeightFac -= statBonus / 2;
+                self.generalVisibilityBonus = 0f + statBonus / 10f;
+                self.loudnessFac = 1.43f - statBonus / 2f;
+                self.visualStealthInSneakMode = 0.11f + statBonus / 2f;
+                self.bodyWeightFac -= statBonus / 2f;
             }
             else
             {
