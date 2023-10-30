@@ -284,15 +284,15 @@ namespace KarmaAppetite
                 case 4:
                     return new IntVector2(6, 5);
                 case 5:
-                    return new IntVector2(7, 6);
+                    return new IntVector2(8, 6);
                 case 6:
                     return new IntVector2(9, 7);
                 case 7:
                     return new IntVector2(10, 8);
                 case 8:
-                    return new IntVector2(11, 9);
+                    return new IntVector2(12, 9);
                 case 9:
-                    return new IntVector2(12, 10);
+                    return new IntVector2(13, 10);
                 case 10:
                     return new IntVector2(FOOD_POTENTIAL, 11);
             }
@@ -317,7 +317,11 @@ namespace KarmaAppetite
                 self.runspeedFac = STAT_BASE - 0.04f + statBonus;
                 self.poleClimbSpeedFac = STAT_BASE + statBonus;
                 self.corridorClimbSpeedFac = STAT_BASE + statBonus;
-                self.lungsFac = STAT_BASE + 1f + statBonus * 4f;
+                self.lungsFac = STAT_BASE + 0.02f - statBonus;
+                if (self.lungsFac < 0.2f)
+                {
+                    self.lungsFac = 0.2f;
+                }
 
                 self.generalVisibilityBonus = statBonus / 10f;
                 self.loudnessFac = 1.41f - statBonus / 2f;
