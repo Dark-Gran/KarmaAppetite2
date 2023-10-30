@@ -322,7 +322,7 @@ namespace KarmaAppetite
                 self.generalVisibilityBonus = statBonus / 10f;
                 self.loudnessFac = 1.41f - statBonus / 2f;
                 self.visualStealthInSneakMode = 0.12f + statBonus / 2f;
-                self.bodyWeightFac -= statBonus / 2f;
+                self.bodyWeightFac = 1.1f - statBonus / 2f;
             }
             else
             {
