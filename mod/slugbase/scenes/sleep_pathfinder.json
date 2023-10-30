@@ -1,0 +1,16 @@
+{
+	"id": "Sleep_Pathfinder",
+	"scene_folder": "scenes/sleep - pathfinder",
+	"images": [
+		{ "name": "sleep_p5",					"pos": [672, 236], "depth": 3.7, "shader": "Basic" },
+		{ "name": "sleep_p4",					"pos": [674, 138], "depth": 2.8, "shader": "Basic" },
+		{ "name": "sleep_p3",					"pos": [719, 107], "depth": 2.2, "shader": "Basic" },
+		{ "name": "sleep_pathfinder", "pos": [817, 112], "depth": 2.0, "shader": "Basic" },
+		{ "name": "sleep_p1",					"pos": [486, -54], "depth": 1.7, "shader": "Basic" }
+	],
+	"idle_depths": [ 2.8 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [0, 0],
+	"slugcat_depth": 2.0
+}

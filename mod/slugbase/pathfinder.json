@@ -6,17 +6,19 @@
 		"color": "ad521a",
 
 		"select_menu_scene": "Slugcat_Pathfinder",
-		"select_menu_scene_ascended": "Ghost_Pathfinder",
+		"select_menu_scene_ascended": "Slugcat_Pathfinder",
+		"sleep_scene": "Sleep_Pathfinder",
 
 		"back_spear": true,
 		"karma": 6,
 		"karma_cap": 6,
 		"the_mark": true,
 		"the_glow": false,
+		"start_room": "SU_A42",
 		"has_dreams": true,
 		"use_default_dreams": false,
 		"world_state": [ "Rivulet", "Red" ],
-		"timeline_before": ["Saint"],
+		"timeline_before": [ "Saint" ],
 		"timeline_after": [ "Rivulet", "Red" ],
 		"diet": {
 			"corpses": 1.0,
