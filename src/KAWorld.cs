@@ -9,6 +9,7 @@ using UnityEngine;
 using SlugBase.Features;
 using MoreSlugcats;
 using SlugBase.DataTypes;
+using IL;
 
 namespace KarmaAppetite
 {
@@ -22,11 +23,12 @@ namespace KarmaAppetite
             On.GateKarmaGlyph.ctor += hook_GateKarmaGlyph_ctor;
             On.RegionGate.customKarmaGateRequirements += hook_RegionGate_customKarmaGateRequirements;
             On.SlugcatStats.getSlugcatOptionalRegions += hook_SlugcatStats_getSlugcatOptionalRegions;
+            On.MoreSlugcats.MSCRoomSpecificScript.RM_CORE_EnergyCell.Update += hook_RM_CORE_EnergyCell;
+            On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
         }
 
 
         //------IMPLEMENTATION------
-
 
         //---OE+LC REGIONS ACCESS---
 
@@ -81,13 +83,25 @@ namespace KarmaAppetite
             {
                 list.Add("LC");
             }
-            /*bool flag3 = !list.Contains("HR");
-            if (flag3)
-            {
-                list.Add("HR");
-            }*/
             return list.ToArray();
         }
 
+        //---5P: ENERGY CELL---
+
+        private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
+        {
+            orig.Invoke(self, saveStateNumber, game);
+            self.saveState.miscWorldSaveData.pebblesEnergyTaken = true;
+            self.saveState.miscWorldSaveData.moonHeartRestored = true;
+        }
+
+        private void hook_RM_CORE_EnergyCell(On.MoreSlugcats.MSCRoomSpecificScript.RM_CORE_EnergyCell.orig_Update orig, MSCRoomSpecificScript.RM_CORE_EnergyCell self, bool eu)
+        {
+            orig.Invoke(self, eu);
+            if (self.myEnergyCell != null)
+            {
+                self.room.RemoveObject(self.myEnergyCell);
+            }
+        }
     }
 }

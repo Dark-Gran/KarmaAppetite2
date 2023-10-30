@@ -317,7 +317,7 @@ namespace KarmaAppetite
                 self.runspeedFac = STAT_BASE - 0.04f + statBonus;
                 self.poleClimbSpeedFac = STAT_BASE + statBonus;
                 self.corridorClimbSpeedFac = STAT_BASE + statBonus;
-                self.lungsFac = STAT_BASE + statBonus * 5f;
+                self.lungsFac = STAT_BASE + 1f + statBonus * 4f;
 
                 self.generalVisibilityBonus = statBonus / 10f;
                 self.loudnessFac = 1.41f - statBonus / 2f;
