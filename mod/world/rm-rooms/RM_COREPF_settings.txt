@@ -1,0 +1,11 @@
+Template: RM_SettingsTemplate_Dead
+RumbleIntensity: 0
+BkgDroneVolume: 0.3043478
+Palette: 10
+EffectColorA: 18
+EffectColorB: 12
+Effects: ZeroG-0.3478261-271-132, BrokenZeroG-0.3478261-278-18, 
+PlacedObjects: Corruption><1239.674><244.5988><0~100, CorruptionTube><148.8409><324.1781><296~710, 
+AmbientSounds: SPOT><SO_SFX-Heartbeat1.ogg><661.9979><401.95><0.6847826><0.5304348><900.9978><822.95><188.6447><73.64465><0><1, SPOT><SO_SFX-Escape.ogg><661.9363><518.8226><0.2391304><1.332609><896.9363><831.8226><583.6447><176.6447><1><1, 
+FadePalette: 27, 0.3152174, 0.3152174, 0.3152174, 0.3152174
+RoomSpecificScriptActive: ON
