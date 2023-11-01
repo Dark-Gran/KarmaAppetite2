@@ -35,6 +35,7 @@ namespace KarmaAppetite
             KarmaAppetiteEnums.KAType.RegisterValues();
 
             //Visuals
+            On.PlayerGraphics.InitiateSprites += hook_PlayerGraphics_InitiateSprites;
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
             On.PlayerProgression.SaveToDisk += hook_PlayerProgression_SaveToDisk;
             On.OracleSwarmer.BitByPlayer += hook_OracleSwarmer_BitByPlayer;
@@ -85,6 +86,7 @@ namespace KarmaAppetite
                 return;
             }
             this.initialized = true;
+            //Config menu
             optionsInstance = new KAOptions();
             try
             {
@@ -96,6 +98,8 @@ namespace KarmaAppetite
                 base.Logger.LogError(ex);
                 base.Logger.LogMessage("OOPS");
             }
+            //Halo
+            Futile.atlasManager.LoadAtlas("atlases/halo");
         }
 
 
@@ -142,10 +146,70 @@ namespace KarmaAppetite
 
         //---VISUALS---
 
-        private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
+        private Halo playerHalo = null;
+        private const float HALO_OFFSET_Y = 10f;
+
+        public class Halo : CosmeticSprite
+        {
+
+            public Halo(Vector2 pos)
+            {
+                this.pos = pos;
+            }
+
+            public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+            {
+                sLeaser.sprites = new FSprite[1];
+                sLeaser.sprites[0] = new FSprite("halo", true)
+                {
+                    color = Color.white,
+                    scale = 1f
+                };
+                this.AddToContainer(sLeaser, rCam, null);
+                base.InitiateSprites(sLeaser, rCam);
+            }
+
+            public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+            {
+                base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+                sLeaser.sprites[0].SetPosition(this.pos - camPos);
+                sLeaser.sprites[0].SetElementByName("halo");
+            }
+
+            public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+            {
+                if (newContatiner == null)
+                {
+                    newContatiner = rCam.ReturnFContainer("Foreground");
+
+                }
+                foreach (FSprite fsprite in sLeaser.sprites)
+                {
+                    fsprite.RemoveFromContainer();
+                    newContatiner.AddChild(fsprite);
+                }
+            }
+        }
+
+
+        private void hook_PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+            playerHalo = new Halo(new Vector2(self.head.pos.x, self.head.pos.y + HALO_OFFSET_Y));
+            self.player.room.AddObject(playerHalo);
+            orig.Invoke(self, sLeaser, rCam);
+
+        }
+
+        private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
 
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+
+            //Halo update
+            if (playerHalo != null)
+            {
+                playerHalo.pos = new Vector2(self.head.pos.x, self.head.pos.y + HALO_OFFSET_Y);
+            }
 
             //Saint-Hair
 
@@ -167,10 +231,10 @@ namespace KarmaAppetite
                         }
                         else
                         {
-                            UnityEngine.Vector2 vector = UnityEngine.Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
-                            UnityEngine.Vector2 vector2 = UnityEngine.Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
-                            UnityEngine.Vector2 vector3 = UnityEngine.Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
-                            float num = Custom.AimFromOneVectorToAnother(UnityEngine.Vector2.Lerp(vector2, vector, 0.5f), vector3);
+                            Vector2 vector = Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
+                            Vector2 vector2 = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
+                            Vector2 vector3 = Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
+                            float num = Custom.AimFromOneVectorToAnother(Vector2.Lerp(vector2, vector, 0.5f), vector3);
                             hair_num = Mathf.RoundToInt(Mathf.Abs(num / 360f * 34f));
                         }
                     }
