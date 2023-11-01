@@ -86,6 +86,7 @@ namespace KarmaAppetite
                 return;
             }
             this.initialized = true;
+            
             //Config menu
             optionsInstance = new KAOptions();
             try
@@ -98,6 +99,7 @@ namespace KarmaAppetite
                 base.Logger.LogError(ex);
                 base.Logger.LogMessage("OOPS");
             }
+
             //Halo
             Futile.atlasManager.LoadAtlas("atlases/halo");
         }
@@ -146,60 +148,21 @@ namespace KarmaAppetite
 
         //---VISUALS---
 
-        private Halo playerHalo = null;
-
-        public class Halo : CosmeticSprite
-        {
-            
-            private Vector2 lastPos;
-
-            public Halo(Vector2 pos)
-            {
-                this.pos = pos;
-                this.lastPos = pos;
-            }
-
-            public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
-            {
-                sLeaser.sprites = new FSprite[1];
-                sLeaser.sprites[0] = new FSprite("halo", true)
-                {
-                    color = Color.white,
-                    scale = 1f
-                };
-                this.AddToContainer(sLeaser, rCam, null);
-                base.InitiateSprites(sLeaser, rCam);
-            }
-
-            public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
-            {
-                base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
-                sLeaser.sprites[0].SetPosition(this.pos - camPos);
-                sLeaser.sprites[0].SetElementByName("halo");
-            }
-
-            public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
-            {
-                if (newContatiner == null)
-                {
-                    newContatiner = rCam.ReturnFContainer("Foreground");
-
-                }
-                foreach (FSprite fsprite in sLeaser.sprites)
-                {
-                    fsprite.RemoveFromContainer();
-                    newContatiner.AddChild(fsprite);
-                }
-            }
-        }
-
+        private int haloSpriteIndex = -1;
 
         private void hook_PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            playerHalo = new Halo(new Vector2(self.head.pos.x, self.head.pos.y + 20f));
-            self.player.room.AddObject(playerHalo);
             orig.Invoke(self, sLeaser, rCam);
 
+            //Halo
+            haloSpriteIndex = sLeaser.sprites.Length;
+            Array.Resize<FSprite>(ref sLeaser.sprites, sLeaser.sprites.Length + 1);
+            sLeaser.sprites[haloSpriteIndex] = new FSprite("halo", true);
+            self.AddToContainer(sLeaser, rCam, null);
+            
+            rCam.ReturnFContainer("Foreground").RemoveChild(sLeaser.sprites[haloSpriteIndex]);
+            rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[haloSpriteIndex]);
+            sLeaser.sprites[haloSpriteIndex].MoveBehindOtherNode(sLeaser.sprites[0]);
         }
 
         private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
@@ -208,11 +171,9 @@ namespace KarmaAppetite
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
 
             //Halo update
-            if (playerHalo != null)
-            {
-                Vector2 newPos = new Vector2(self.head.pos.x, self.head.pos.y + ((self.player.bodyMode == Player.BodyModeIndex.Crawl) ? 30f : 20f));
-                playerHalo.pos = Vector2.Lerp(playerHalo.lastPos, newPos, timeStacker);
-            }
+            sLeaser.sprites[haloSpriteIndex].x = self.head.pos.x - camPos.x;
+            sLeaser.sprites[haloSpriteIndex].y = self.head.pos.y - camPos.y;
+            sLeaser.sprites[haloSpriteIndex].color = Color.white;
 
             //Saint-Hair
 
@@ -234,10 +195,10 @@ namespace KarmaAppetite
                         }
                         else
                         {
-                            Vector2 vector = Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
-                            Vector2 vector2 = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
-                            Vector2 vector3 = Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
-                            float num = Custom.AimFromOneVectorToAnother(Vector2.Lerp(vector2, vector, 0.5f), vector3);
+                            Vector2 vectorA = Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
+                            Vector2 vectorB = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
+                            Vector2 vectorC = Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
+                            float num = Custom.AimFromOneVectorToAnother(Vector2.Lerp(vectorB, vectorA, 0.5f), vectorC);
                             hair_num = Mathf.RoundToInt(Mathf.Abs(num / 360f * 34f));
                         }
                     }
