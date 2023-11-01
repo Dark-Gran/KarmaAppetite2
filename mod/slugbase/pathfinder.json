@@ -29,6 +29,7 @@
 			"overrides": {
 				"KarmaFlower": 1.0
 			}
-		}
+		},
+		"title_card": "Title_Card_Pathfinder"
 	}
 }
