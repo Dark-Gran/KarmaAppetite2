@@ -178,6 +178,7 @@ namespace KarmaAppetite
             sLeaser.sprites[haloSpriteIndex].x = self.head.pos.x - camPos.x;
             sLeaser.sprites[haloSpriteIndex].y = self.head.pos.y - camPos.y;
             sLeaser.sprites[haloSpriteIndex].color = Color.white;
+            sLeaser.sprites[haloSpriteIndex].isVisible = SwallowedVoidPearl(self.player);
 
             //Saint-Hair
 
@@ -214,9 +215,9 @@ namespace KarmaAppetite
 
             //Golden eyes on Karma10
 
-            if (self.owner is Player && (self.owner as Player).Karma >= 9)
+            if ((self.player.Karma >= 9 && self.player.CurrentFood != 0) || SwallowedVoidPearl(self.player))
             {
-                sLeaser.sprites[9].color = new Color(0.976f, 0.584f, 0f);
+                sLeaser.sprites[9].color = new Color(0.98f, 0.7f, 0f);
             }
 
             //Tunneling
@@ -228,14 +229,14 @@ namespace KarmaAppetite
         {
             if (saveCurrentState && self.currentSaveState != null)
             {
-                self.currentSaveState.theGlow = ShouldGlow(self.currentSaveState.deathPersistentSaveData.karma, self.currentSaveState.food);
+                self.currentSaveState.theGlow = ShouldGlow(self.currentSaveState.deathPersistentSaveData.karma, self.currentSaveState.food); //Note: missing SwallowedVoidPearl check - ok because refresh after load? THEREFORE Deprecated? Needs a test.
             }
             return orig.Invoke(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 
         private static void RefreshGlow(Player self)
         {
-            bool glowing = ShouldGlow(self.Karma, self.CurrentFood);
+            bool glowing = ShouldGlow(self.Karma, self.CurrentFood, self);
             if (self.glowing != glowing)
             {
                 self.glowing = glowing;
@@ -271,9 +272,9 @@ namespace KarmaAppetite
             }
         }
 
-        private static bool ShouldGlow(int karma, int food)
+        private static bool ShouldGlow(int karma, int food, Player plr=null)
         {
-            return optionsInstance.alwaysGlow.Value || (karma >= KABase.STARTING_MAX_KARMA && food != 0);
+            return SwallowedVoidPearl(plr) || optionsInstance.alwaysGlow.Value || (karma >= KABase.STARTING_MAX_KARMA && food != 0);
         }
 
         private void hook_OracleSwarmer_BitByPlayer(On.OracleSwarmer.orig_BitByPlayer orig, OracleSwarmer self, Creature.Grasp grasp, bool eu)
@@ -295,14 +296,32 @@ namespace KarmaAppetite
         private const int DISLODGE_FOOD = 1; //food in stomach for dislodge
         private const int FOOD_POTENTIAL = 14; //max food with max karma
 
+        private static bool GetsHighestKarmaBonus(Player plr)
+        {
+            if (plr == null)
+            {
+                return false;
+            }
+            return plr.Karma >= 9 || SwallowedVoidPearl(plr);
+        }
+
+        private static bool SwallowedVoidPearl(Player plr)
+        {
+            if (plr == null)
+            {
+                return false;
+            }
+            return plr.objectInStomach is DataPearl.AbstractDataPearl && (plr.objectInStomach as DataPearl.AbstractDataPearl).dataPearlType == KarmaAppetiteEnums.KAType.VoidPearl;
+        }
+
         //REFRESH
 
         private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
         {
             orig.Invoke(self, saveStateNumber, game);
             KarmaToFood(self.characterStats, self.saveState.deathPersistentSaveData.karma);
-            FoodToStats(self.characterStats, self.saveState.food, self.saveState.deathPersistentSaveData.karma >= 9);
-            self.saveState.theGlow = ShouldGlow(self.saveState.deathPersistentSaveData.karma, self.saveState.food);
+            FoodToStats(self.characterStats, self.saveState.food, null, self.saveState.deathPersistentSaveData.karma >= 9); //Note: missing SwallowedVoidPearl check - ok because refresh after load? THEREFORE Deprecated? Needs a test.
+            self.saveState.theGlow = ShouldGlow(self.saveState.deathPersistentSaveData.karma, self.saveState.food); //Same as the line above (= missing check: deprecated?)
             RefreshAllPlayers(self);
         }
 
@@ -314,7 +333,7 @@ namespace KarmaAppetite
                 {
                     Player player = ac.realizedCreature as Player;
                     KarmaToFood(player.slugcatStats, player.Karma);
-                    FoodToStats(player.slugcatStats, player.CurrentFood, player.Karma >= 9);
+                    FoodToStats(player.slugcatStats, player.CurrentFood, player);
                     RefreshGlow(player);
                 }
             }
@@ -356,15 +375,18 @@ namespace KarmaAppetite
             self.foodToHibernate = GetFoodFromKarma(karma).y;
         }
 
-        private static void FoodToStats(SlugcatStats self, int food, bool extraStats)
+        private static void FoodToStats(SlugcatStats self, int food, Player plr = null, bool forceHighKarma = false)
         {
 
             if (!self.malnourished)
             {
                 self.throwingSkill = (food > 0) ? 2 : 0;
 
-                float statBonus = food * ((extraStats) ? 0.06f : 0.03f);
-
+                float statBonus = food * 0.03f;
+                if ((plr != null && GetsHighestKarmaBonus(plr)) || forceHighKarma)
+                {
+                    statBonus *= 2f;
+                }
                 const float STAT_BASE = 0.88f;
                 self.runspeedFac = STAT_BASE - 0.04f + statBonus;
                 self.poleClimbSpeedFac = STAT_BASE + statBonus;
@@ -379,6 +401,21 @@ namespace KarmaAppetite
                 self.loudnessFac = 1.41f - statBonus / 2f;
                 self.visualStealthInSneakMode = 0.12f + statBonus / 2f;
                 self.bodyWeightFac = 1.1f - statBonus / 2f;
+
+                //Extra extra bonus for Void Pearl
+                if (plr != null && SwallowedVoidPearl(plr))
+                {
+                    self.runspeedFac += 0.3f;
+                    self.poleClimbSpeedFac += 0.3f;
+                    self.corridorClimbSpeedFac += 0.3f;
+                    self.lungsFac -= food;
+                    if (self.lungsFac < 0.1f)
+                    {
+                        self.lungsFac = 0.1f;
+                    }
+                    self.bodyWeightFac += 0.02f;
+                }
+
             }
             else
             {
@@ -394,9 +431,14 @@ namespace KarmaAppetite
         private void hook_Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player self, Spear spear)
         {
             orig.Invoke(self, spear);
-            spear.spearDamageBonus = 0.25f + ((self.playerState.foodInStomach / (FOOD_POTENTIAL / 10)) * ((self.Karma >= 9) ? 1f : 0.5f));
+            spear.spearDamageBonus = 0.25f + ((self.playerState.foodInStomach / (FOOD_POTENTIAL / 10)) * (GetsHighestKarmaBonus(self) ? 1f : 0.5f));
             BodyChunk firstChunk2 = spear.firstChunk;
             float speedBoost = 0.73f + (self.playerState.foodInStomach / 12);
+            if (SwallowedVoidPearl(self)) //Void Pearl bonus
+            {
+                spear.spearDamageBonus += 1f;
+                speedBoost += 0.3f;
+            }
             if (speedBoost < 1f && self.playerState.foodInStomach > 0) { speedBoost = 1f; }
             firstChunk2.vel.x = firstChunk2.vel.x * speedBoost;
         }
@@ -418,13 +460,13 @@ namespace KarmaAppetite
         {
             orig.Invoke(self, m);
             KarmaToFood(self.slugcatStats, self.Karma);
-            FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
+            FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self);
         }
 
         private void hook_Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
         {
             orig.Invoke(self, add);
-            FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
+            FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self);
             RefreshGlow(self);
         }
 
@@ -439,7 +481,7 @@ namespace KarmaAppetite
                     self.SubtractFood(1);
 
                     self.playerState.quarterFoodPoints += 3;
-                    FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self.Karma >= 9);
+                    FoodToStats(self.slugcatStats, self.playerState.foodInStomach, self);
                     RefreshGlow(self);
                 }
             }
@@ -486,7 +528,7 @@ namespace KarmaAppetite
 
         public static bool CanAffordPrice(Player self, int price, bool neverFree = false)
         {
-            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || (self.Karma >= STARTING_MAX_KARMA && !neverFree);
+            return (self.playerState.foodInStomach * 4 + self.playerState.quarterFoodPoints) >= price || ((self.Karma >= STARTING_MAX_KARMA || SwallowedVoidPearl(self)) && !neverFree);
         }
 
 
@@ -585,7 +627,7 @@ namespace KarmaAppetite
 
         public static void PayDay(Player self, int quarterPrice, bool neverFree=false)
         {
-            if (self.Karma < STARTING_MAX_KARMA || neverFree)
+            if ((self.Karma < STARTING_MAX_KARMA && !SwallowedVoidPearl(self)) || neverFree)
             {
                 for (int i = 0; i < quarterPrice; i++)
                 {
@@ -696,7 +738,7 @@ namespace KarmaAppetite
                         PayDay(self, 4);
                         break;
                     }
-                    if (self.Karma >= 9 && ((physicalObject is OracleSwarmer && physicalObject2 is OracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordCraft(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
+                    if (GetsHighestKarmaBonus(self) && ((physicalObject is OracleSwarmer && physicalObject2 is OracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordCraft(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
                     {
                         newItem = SpawnObject(self, MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);
