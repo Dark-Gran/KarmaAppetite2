@@ -147,14 +147,16 @@ namespace KarmaAppetite
         //---VISUALS---
 
         private Halo playerHalo = null;
-        private const float HALO_OFFSET_Y = 10f;
 
         public class Halo : CosmeticSprite
         {
+            
+            private Vector2 lastPos;
 
             public Halo(Vector2 pos)
             {
                 this.pos = pos;
+                this.lastPos = pos;
             }
 
             public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
@@ -194,7 +196,7 @@ namespace KarmaAppetite
 
         private void hook_PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            playerHalo = new Halo(new Vector2(self.head.pos.x, self.head.pos.y + HALO_OFFSET_Y));
+            playerHalo = new Halo(new Vector2(self.head.pos.x, self.head.pos.y + 20f));
             self.player.room.AddObject(playerHalo);
             orig.Invoke(self, sLeaser, rCam);
 
@@ -208,7 +210,8 @@ namespace KarmaAppetite
             //Halo update
             if (playerHalo != null)
             {
-                playerHalo.pos = new Vector2(self.head.pos.x, self.head.pos.y + HALO_OFFSET_Y);
+                Vector2 newPos = new Vector2(self.head.pos.x, self.head.pos.y + ((self.player.bodyMode == Player.BodyModeIndex.Crawl) ? 30f : 20f));
+                playerHalo.pos = Vector2.Lerp(playerHalo.lastPos, newPos, timeStacker);
             }
 
             //Saint-Hair
