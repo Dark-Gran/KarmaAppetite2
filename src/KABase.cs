@@ -215,7 +215,7 @@ namespace KarmaAppetite
 
             //Golden eyes on Karma10
 
-            if ((self.player.Karma >= 9 && self.player.CurrentFood != 0) || SwallowedVoidPearl(self.player))
+            if ((self.player.Karma >= 9 && self.player.CurrentFood == FOOD_POTENTIAL) || SwallowedVoidPearl(self.player))
             {
                 sLeaser.sprites[9].color = new Color(0.98f, 0.7f, 0f);
             }
