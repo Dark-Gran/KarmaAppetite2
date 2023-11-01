@@ -149,6 +149,7 @@ namespace KarmaAppetite
         //---VISUALS---
 
         private int haloSpriteIndex = -1;
+        private const bool HALO_BEHIND_SLUGCAT = true;
 
         private void hook_PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
@@ -160,9 +161,12 @@ namespace KarmaAppetite
             sLeaser.sprites[haloSpriteIndex] = new FSprite("halo", true);
             self.AddToContainer(sLeaser, rCam, null);
             
-            rCam.ReturnFContainer("Foreground").RemoveChild(sLeaser.sprites[haloSpriteIndex]);
-            rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[haloSpriteIndex]);
-            sLeaser.sprites[haloSpriteIndex].MoveBehindOtherNode(sLeaser.sprites[0]);
+            if (HALO_BEHIND_SLUGCAT)
+            {
+                rCam.ReturnFContainer("Foreground").RemoveChild(sLeaser.sprites[haloSpriteIndex]);
+                rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[haloSpriteIndex]);
+                sLeaser.sprites[haloSpriteIndex].MoveBehindOtherNode(sLeaser.sprites[0]);
+            }
         }
 
         private void hook_PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
