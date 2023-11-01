@@ -10,6 +10,7 @@ using SlugBase.Features;
 using MoreSlugcats;
 using SlugBase.DataTypes;
 using IL;
+using static KarmaAppetite.KABase;
 
 namespace KarmaAppetite
 {
@@ -20,13 +21,20 @@ namespace KarmaAppetite
 
         public void KAWorld_Hooks()
         {
+            //Region access
             On.GateKarmaGlyph.ctor += hook_GateKarmaGlyph_ctor;
             On.RegionGate.customKarmaGateRequirements += hook_RegionGate_customKarmaGateRequirements;
             On.SlugcatStats.getSlugcatOptionalRegions += hook_SlugcatStats_getSlugcatOptionalRegions;
+            //Energy cell
             On.MoreSlugcats.MSCRoomSpecificScript.RM_CORE_EnergyCell.Update += hook_RM_CORE_EnergyCell;
+            //Pearls
             On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
+            On.DataPearl.ApplyPalette += hook_DataPearl_ApplyPalette;
+            On.DataPearl.UniquePearlMainColor += hook_DataPearl_UniquePearlMainColor;
+            On.DataPearl.UniquePearlHighLightColor += hook_DataPearl_UniquePearlHighLightColor;
+            On.SLOracleBehaviorHasMark.GrabObject += hook_SLOracleBehaviorHasMark_GrabObject;
+            On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += hook_MoonConversation_AddEvents;
         }
-
 
         //------IMPLEMENTATION------
 
@@ -103,5 +111,106 @@ namespace KarmaAppetite
                 self.room.RemoveObject(self.myEnergyCell);
             }
         }
+
+        //---DATA PEARLS--- (enums added in Base)
+
+        //Pearl visuals
+        private void hook_DataPearl_ApplyPalette(On.DataPearl.orig_ApplyPalette orig, DataPearl self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+            orig.Invoke(self, sLeaser, rCam, palette);
+            if ((self.abstractPhysicalObject as DataPearl.AbstractDataPearl).dataPearlType == KarmaAppetiteEnums.KAType.TCoSPearl || (self.abstractPhysicalObject as DataPearl.AbstractDataPearl).dataPearlType == KarmaAppetiteEnums.KAType.CorruptionPearl || (self.abstractPhysicalObject as DataPearl.AbstractDataPearl).dataPearlType == KarmaAppetiteEnums.KAType.VoidPearl)
+            {
+                self.color = DataPearl.UniquePearlMainColor((self.abstractPhysicalObject as DataPearl.AbstractDataPearl).dataPearlType);
+                self.highlightColor = DataPearl.UniquePearlHighLightColor((self.abstractPhysicalObject as DataPearl.AbstractDataPearl).dataPearlType);
+            }
+        }
+
+        private Color? hook_DataPearl_UniquePearlHighLightColor(On.DataPearl.orig_UniquePearlHighLightColor orig, DataPearl.AbstractDataPearl.DataPearlType pearlType)
+        {
+            Color? orig_result = orig.Invoke(pearlType);
+            if (pearlType == KarmaAppetiteEnums.KAType.CorruptionPearl)
+            {
+                return new Color(0.416f, 0.62f, 1f);
+            }
+            if (pearlType == KarmaAppetiteEnums.KAType.VoidPearl)
+            {
+                return new Color(1f, 0.55f, 0f);
+            }
+            return orig_result;
+        }
+
+        private Color hook_DataPearl_UniquePearlMainColor(On.DataPearl.orig_UniquePearlMainColor orig, DataPearl.AbstractDataPearl.DataPearlType pearlType)
+        {
+            Color orig_result = orig.Invoke(pearlType);
+            if (pearlType == KarmaAppetiteEnums.KAType.TCoSPearl)
+            {
+                return new Color(0.89f, 0.42f, 0f);
+            }
+            if (pearlType == KarmaAppetiteEnums.KAType.CorruptionPearl)
+            {
+                return new Color(0.173f, 0.337f, 1f);
+            }
+            if (pearlType == KarmaAppetiteEnums.KAType.VoidPearl)
+            {
+                return new Color(0.98f, 0.741f, 0f);
+            }
+            return orig_result;
+        }
+
+        //Halo if swallowed Voidpearl
+
+
+
+        //Conversations
+        private void hook_SLOracleBehaviorHasMark_GrabObject(On.SLOracleBehaviorHasMark.orig_GrabObject orig, SLOracleBehaviorHasMark self, PhysicalObject item)
+        {
+            if (item is DataPearl)
+            {
+                if ((item as DataPearl).AbstractPearl.dataPearlType == KarmaAppetiteEnums.KAType.TCoSPearl)
+                {
+                    self.currentConversation = new SLOracleBehaviorHasMark.MoonConversation(KarmaAppetiteEnums.KAType.Moon_Pearl_TCoS, self, SLOracleBehaviorHasMark.MiscItemType.NA);
+                }
+                else if ((item as DataPearl).AbstractPearl.dataPearlType == KarmaAppetiteEnums.KAType.CorruptionPearl)
+                {
+                    self.currentConversation = new SLOracleBehaviorHasMark.MoonConversation(KarmaAppetiteEnums.KAType.Moon_Pearl_Corruption, self, SLOracleBehaviorHasMark.MiscItemType.NA);
+                }
+                else if ((item as DataPearl).AbstractPearl.dataPearlType == KarmaAppetiteEnums.KAType.VoidPearl)
+                {
+                    self.currentConversation = new SLOracleBehaviorHasMark.MoonConversation(KarmaAppetiteEnums.KAType.Moon_Pearl_Void, self, SLOracleBehaviorHasMark.MiscItemType.NA);
+                }
+            }
+            orig.Invoke(self, item);
+        }
+
+        private void hook_MoonConversation_AddEvents(On.SLOracleBehaviorHasMark.MoonConversation.orig_AddEvents orig, SLOracleBehaviorHasMark.MoonConversation self)
+        {
+            orig.Invoke(self);
+            if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_TCoS)
+            {
+                self.PearlIntro();
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "... [TCoS Pearl text]"
+                    ), 10));
+                return;
+            }
+            if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_Corruption)
+            {
+                self.PearlIntro();
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "... [Corruption Pearl text]"
+                    ), 10));
+                return;
+            }
+            if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_Void)
+            {
+                self.PearlIntro();
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "... [Void Pearl text]"
+                    ), 10));
+                return;
+            }
+        }
+
+
     }
 }

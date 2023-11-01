@@ -32,7 +32,7 @@ namespace KarmaAppetite
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit);
 
             //Enums
-            KarmaAppetiteEnums.APOType.RegisterValues();
+            KarmaAppetiteEnums.KAType.RegisterValues();
 
             //Visuals
             On.PlayerGraphics.DrawSprites += hook_PlayerGraphics_DrawSprites;
@@ -64,7 +64,7 @@ namespace KarmaAppetite
         public void OnDisable()
         {
             //Enums
-            KarmaAppetiteEnums.APOType.UnregisterValues();
+            KarmaAppetiteEnums.KAType.UnregisterValues();
         }
 
         private void LoadResources(RainWorld rainWorld) { }
@@ -103,18 +103,38 @@ namespace KarmaAppetite
 
         public class KarmaAppetiteEnums
         {
-            public class APOType
+            public class KAType
             {
                 public static AbstractPhysicalObject.AbstractObjectType SpearShard; //CRAFTING - "rocks made out of spear"
+                public static DataPearl.AbstractDataPearl.DataPearlType TCoSPearl; //WORLD - message-pearl
+                public static DataPearl.AbstractDataPearl.DataPearlType CorruptionPearl; //WORLD - c-pearl
+                public static DataPearl.AbstractDataPearl.DataPearlType VoidPearl; //WORLD - g-pearl
+                public static Conversation.ID Moon_Pearl_TCoS;
+                public static Conversation.ID Moon_Pearl_Corruption;
+                public static Conversation.ID Moon_Pearl_Void;
+
+
 
                 public static void RegisterValues()
                 {
                     SpearShard = new AbstractPhysicalObject.AbstractObjectType("SpearShard", true);
+                    TCoSPearl = new DataPearl.AbstractDataPearl.DataPearlType("TCoSPearl", true);
+                    CorruptionPearl = new DataPearl.AbstractDataPearl.DataPearlType("CorruptionPearl", true);
+                    VoidPearl = new DataPearl.AbstractDataPearl.DataPearlType("VoidPearl", true);
+                    Moon_Pearl_TCoS = new Conversation.ID("Moon_Pearl_TCoS", true);
+                    Moon_Pearl_Corruption = new Conversation.ID("Moon_Pearl_Corruption", true);
+                    Moon_Pearl_Void = new Conversation.ID("Moon_Pearl_Void", true);
                 }
 
                 public static void UnregisterValues()
                 {
                     if (SpearShard != null) { SpearShard.Unregister(); SpearShard = null; }
+                    if (TCoSPearl != null) { TCoSPearl.Unregister(); TCoSPearl = null; }
+                    if (CorruptionPearl != null) { CorruptionPearl.Unregister(); CorruptionPearl = null; }
+                    if (VoidPearl != null) { VoidPearl.Unregister(); VoidPearl = null; }
+                    if (Moon_Pearl_TCoS != null) { Moon_Pearl_TCoS.Unregister(); Moon_Pearl_TCoS = null; }
+                    if (Moon_Pearl_Corruption != null) { Moon_Pearl_Corruption.Unregister(); Moon_Pearl_Corruption = null; }
+                    if (Moon_Pearl_Void != null) { Moon_Pearl_Void.Unregister(); Moon_Pearl_Void = null; }
                 }
             }
         }
@@ -734,8 +754,8 @@ namespace KarmaAppetite
                 PhysicalObject objectPartB = null;
                 if (physicalObject is Spear) // Spear => 2 Rocks
                 {
-                    objectPartA = SpawnObject(self, KarmaAppetiteEnums.APOType.SpearShard, room, self.abstractCreature.pos, "");
-                    objectPartB = SpawnObject(self, KarmaAppetiteEnums.APOType.SpearShard, room, self.abstractCreature.pos, "");
+                    objectPartA = SpawnObject(self, KarmaAppetiteEnums.KAType.SpearShard, room, self.abstractCreature.pos, "");
+                    objectPartB = SpawnObject(self, KarmaAppetiteEnums.KAType.SpearShard, room, self.abstractCreature.pos, "");
                 }
                 else if (physicalObject is ExplosiveSpear) //Explosive Spear => Spear + Bomb
                 {
@@ -846,7 +866,7 @@ namespace KarmaAppetite
 
         private void hook_AbstractPhysicalObject_Realize(On.AbstractPhysicalObject.orig_Realize orig, AbstractPhysicalObject self)
         {
-            if (self.type == KarmaAppetiteEnums.APOType.SpearShard)
+            if (self.type == KarmaAppetiteEnums.KAType.SpearShard)
             {
                 self.realizedObject = new SpearShard(self, self.world);
             }
