@@ -3,7 +3,7 @@
 	"name": "The Pathfinder",
 	"description": "...<LINE>...",
 	"features": {
-		"color": "ad521a",
+		"color": "d6650f",
 
 		"select_menu_scene": "Slugcat_Pathfinder",
 		"select_menu_scene_ascended": "Slugcat_Pathfinder",
@@ -14,7 +14,7 @@
 		"karma_cap": 6,
 		"the_mark": true,
 		"the_glow": false,
-		"start_room": "GATE_SX_SU",
+		"start_room": "SX_B01",
 		"has_dreams": true,
 		"use_default_dreams": false,
 		"cycle_length_min": 4.5,
