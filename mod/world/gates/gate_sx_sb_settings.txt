@@ -1,4 +1,4 @@
-Template: NONE
+Template: SX_SettingsTemplate_Inside
 DangerType: Flood
 CeilingDrips: 0.5
 WaveSpeed: 0.75

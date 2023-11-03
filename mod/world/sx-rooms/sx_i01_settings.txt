@@ -1,5 +1,5 @@
-Template: SX_SettingsTemplate_Inside
-Clouds: 1
+Template: SX_SettingsTemplate_Superstructure
+Clouds: 0
 Grime: 0
 BkgDroneVolume: 0
 RandomItemDensity: 0

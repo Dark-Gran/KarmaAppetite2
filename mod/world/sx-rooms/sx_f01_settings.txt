@@ -1,6 +1,6 @@
-Template: SX_SettingsTemplate_Inside
-Clouds: 0
-Grime: 0.203476
+Template: SX_SettingsTemplate_Superstructure
 BkgDroneVolume: 0.326087
-Effects: ZeroG-0-30-30, SSSwarmers-0-29.24896-148, 
+RandomItemDensity: 0.4782609
+RandomItemSpearChance: 0.2173913
+Effects: SSSwarmers-0-29.24896-148, ZeroG-0-30-30, Flies-0.0326087-200-181, ProjectedScanLines-0-20-20, 
 FadePalette: 2, 0.7039855, 0.7039852, 0.7085823, 0.705446, 0.7039855, 0.7039858

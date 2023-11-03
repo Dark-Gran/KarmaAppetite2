@@ -1,5 +1,2 @@
-Template: NONE
-Palette: 15
-EffectColorA: 15
-EffectColorB: 15
-FadePalette: 2, 0.6521739, 0.6521739
+Template: SX_SettingsTemplate_Inside
+FadePalette: 2, 0.7065217, 0.7065217

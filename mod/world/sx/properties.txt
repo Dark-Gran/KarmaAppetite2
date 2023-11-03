@@ -9,4 +9,4 @@ overseersMin: 0
 overseersMax: 4
 playerGuideOverseerSpawnChance: 1.0
 Subregion: Outskirts
-Room Setting Templates: Outside, Inside
+Room Setting Templates: Outside, Inside, Superstructure

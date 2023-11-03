@@ -1,21 +1,21 @@
-DangerType: None
+DangerType: Rain
 CeilingDrips: 0.5
 RainIntensity: 1
 RumbleIntensity: 1
-WaveSpeed: 0.5
-WaveLength: 0.5
-WaveAmplitude: 0
+WaveSpeed: 0.4851144
+WaveLength: 0.9925572
+WaveAmplitude: 0.03523574
 SecondWaveLength: 0.1666667
 SecondWaveAmplitude: 0
-Clouds: 0
-Grime: 0.203476
-BkgDroneVolume: 0.326087
+Clouds: 0.1413043
+Grime: 0.3152174
+BkgDroneVolume: 0.2769565
 BkgDroneNoThreatVolume: 1
 RandomItemDensity: 0.5
 RandomItemSpearChance: 0.2
 WaterReflectionAlpha: 1
 Palette: 15
-EffectColorA: 13
-EffectColorB: 15
-Effects: SSSwarmers-0-22-134, ZeroG-1-20-20, ZeroGSpecks-0.423913-14-84, ProjectedScanLines-0.2391304-298-21, SunBlock-1-289-79, SuperStructureProjector-1-562-24, SSMusic-0.2065217-1068-23, Bloom-0.3043478-283-84, BrokenZeroG-0-274-20, Flies-0.01086957-20-20, 
-AmbientSounds: OMNI><AM_IND-SuperStructure.ogg><832.1517><651.5758><0.3152174><0.9021739, OMNI><SO_SFX-Drowning.ogg><658.0538><650.4426><0.4782609><1, OMNI><AM_WIN-StrongWnd2.ogg><835.0914><651.1281><0.75><1, OMNI><AM_ENV-Outside.ogg><764.0152><469.9494><0.3913043><0.7065217, 
+EffectColorA: 15
+EffectColorB: 13
+Effects: Flies-0.0326087-30-30, 
+AmbientSounds: OMNI><AM_ENV-LightWind.ogg><719.6841><558.8281><0.3586957><0.8043478, OMNI><AM_ENV-Outside.ogg><765.4963><477.05><0.5><0.823913, 

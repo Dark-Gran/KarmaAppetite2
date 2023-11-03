@@ -1,11 +1,5 @@
-Template: NONE
-Clouds: 1
-Grime: 0
+Template: SX_SettingsTemplate_Superstructure
 BkgDroneVolume: 0
-RandomItemDensity: 0
-RandomItemSpearChance: 0
-Palette: 3
-EffectColorA: 13
-EffectColorB: 15
-FadePalette: 2, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217
+Effects: ZeroG-0-269-74, SSSwarmers-0-30-30, 
+FadePalette: 2, 0.6086956, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217
 WetTerrain: OFF
