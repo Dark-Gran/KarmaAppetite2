@@ -17,7 +17,7 @@ END ROOMS
 CREATURES
 OFFSCREEN : 0-Vulture-1, 0-Scavenger-2
 SX_B01 : 3-Green
-SX_D01 : 3-CicadaA, 4-CicadaA, 5-Green, 6-PoleMimic
+SX_D01 : 3-CicadaA, 4-CicadaB, 5-Green, 6-PoleMimic
 SX_B02 : 4-BigSpider, 5-BigSpider
 SX_A02 : 2-Centipede-{5}-2
 END CREATURES
