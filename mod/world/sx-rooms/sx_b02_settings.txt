@@ -1,2 +1,3 @@
 Template: SX_SettingsTemplate_Inside
+DangerType: FloodAndRain
 FadePalette: 2, 0.7065217, 0.7065217
