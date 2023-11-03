@@ -14,7 +14,7 @@
 		"karma_cap": 6,
 		"the_mark": true,
 		"the_glow": false,
-		"start_room": "SX_AI",
+		"start_room": "SX_B02",
 		"has_dreams": true,
 		"use_default_dreams": false,
 		"cycle_length_min": 4.5,

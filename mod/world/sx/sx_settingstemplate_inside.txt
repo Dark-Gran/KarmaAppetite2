@@ -17,5 +17,5 @@ WaterReflectionAlpha: 1
 Palette: 15
 EffectColorA: 13
 EffectColorB: 15
-Effects: ZeroG-1-20-20, ZeroGSpecks-0.423913-14-84, ProjectedScanLines-0.2391304-298-21, SunBlock-1-289-79, SSSwarmers-0.07608695-16-147, SuperStructureProjector-1-537-24, SSMusic-0.2065217-1068-23, Bloom-0.3043478-283-84, BrokenZeroG-0-274-20, Flies-0.01086957-20-20, 
+Effects: SSSwarmers-0-22-134, ZeroG-1-20-20, ZeroGSpecks-0.423913-14-84, ProjectedScanLines-0.2391304-298-21, SunBlock-1-289-79, SuperStructureProjector-1-562-24, SSMusic-0.2065217-1068-23, Bloom-0.3043478-283-84, BrokenZeroG-0-274-20, Flies-0.01086957-20-20, 
 AmbientSounds: OMNI><AM_IND-SuperStructure.ogg><832.1517><651.5758><0.3152174><0.9021739, OMNI><SO_SFX-Drowning.ogg><658.0538><650.4426><0.4782609><1, OMNI><AM_WIN-StrongWnd2.ogg><835.0914><651.1281><0.75><1, OMNI><AM_ENV-Outside.ogg><764.0152><469.9494><0.3913043><0.7065217, 
