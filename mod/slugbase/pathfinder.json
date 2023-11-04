@@ -15,7 +15,7 @@
 		"the_mark": true,
 		"the_glow": false,
 		"start_room": "SX_B01",
-		"guide_overseer": 5,
+		"guide_overseer": 6,
 		"has_dreams": true,
 		"use_default_dreams": false,
 		"cycle_length_min": 4.5,

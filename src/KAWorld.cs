@@ -34,6 +34,7 @@ namespace KarmaAppetite
             On.WorldLoader.GeneratePopulation += hook_WorldLoader_GeneratePopulation;
             On.OverseersWorldAI.DirectionFinder.StoryRoomInRegion += hook_OWAI_DirectionFinder_StoryRoomInRegion;
             On.OverseersWorldAI.DirectionFinder.StoryRegionPrioritys += hook_OWAI_DirectionFinder_StoryRegionPrioritys;
+            On.OverseerAbstractAI.AbstractBehavior += hook_OverseerAbstractAI_AbstractBehavior;
             //Pearls
             On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
             On.DataPearl.ApplyPalette += hook_DataPearl_ApplyPalette;
@@ -43,7 +44,7 @@ namespace KarmaAppetite
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += hook_MoonConversation_AddEvents;
         }
 
-
+        
         //------IMPLEMENTATION------
 
         //---OE+LC REGIONS ACCESS---
@@ -152,10 +153,31 @@ namespace KarmaAppetite
                 for (int num3 = 0; num3 < num2; num3++)
                 {
                     AbstractCreature ac = new AbstractCreature(self.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Overseer), null, new WorldCoordinate(self.world.offScreenDen.index, -1, -1, 0), self.game.GetNewID());
-                    (ac.abstractAI as OverseerAbstractAI).ownerIterator = 4; //todo: not sure these actually appear, therefore left to white (change to 6 if ok)
+                    (ac.abstractAI as OverseerAbstractAI).ownerIterator = 6;
                     self.world.offScreenDen.entitiesInDens.Add(ac);
                 }
             }
+        }
+        private void hook_OverseerAbstractAI_AbstractBehavior(On.OverseerAbstractAI.orig_AbstractBehavior orig, OverseerAbstractAI self, int time)
+        {
+            if (self.world.game.Players.Count > 0 && self.RelevantPlayer != null)
+            {
+                if (self.RelevantPlayer.Room.name == "SX_D01" && !self.goToPlayer)
+                {
+                    self.goToPlayer = true;
+                    if (ModManager.MMF)
+                    {
+                        self.SetTargetCreature(self.RelevantPlayer);
+                    }
+                    else
+                    {
+                        self.targetCreature = self.RelevantPlayer;
+                    }
+                    self.playerGuideCounter = 1000;
+                }
+            }
+
+            orig.Invoke(self, time);
         }
 
         private List<string> hook_OWAI_DirectionFinder_StoryRegionPrioritys(On.OverseersWorldAI.DirectionFinder.orig_StoryRegionPrioritys orig, OverseersWorldAI.DirectionFinder self, SlugcatStats.Name saveStateNumber, string currentRegion, bool metMoon, bool metPebbles)

@@ -6,8 +6,8 @@ batDepleteCyclesMaxIfLessThanFiveLeft: 4
 batsPerActiveSwarmRoom: 7
 overseersSpawnChance: 1.0
 overseersMin: 3
-overseersMax: 6
-playerGuideOverseerSpawnChance: 1.0
+overseersMax: 5
+playerGuideOverseerSpawnChance: 0.5
 Subregion: Solemn Quarry
 Subregion: Two Colors of Smoke
 Room Setting Templates: Outside, Inside, Superstructure
