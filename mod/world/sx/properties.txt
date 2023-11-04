@@ -1,12 +1,14 @@
-Palette: 0
+Palette: 15
 batDepleteCyclesMin: 2
 batDepleteCyclesMax: 7
 batDepleteCyclesMaxIfLessThanTwoLeft: 3
 batDepleteCyclesMaxIfLessThanFiveLeft: 4
 batsPerActiveSwarmRoom: 7
-overseersSpawnChance: 0.8
-overseersMin: 0
-overseersMax: 4
+overseersSpawnChance: 1.0
+overseersMin: 3
+overseersMax: 6
 playerGuideOverseerSpawnChance: 1.0
-Subregion: Outskirts
+Subregion: Solemn Quarry
+Subregion: Two Colors of Smoke
 Room Setting Templates: Outside, Inside, Superstructure
+Room_Attr: SX_I01: Vulture-Forbidden, KingVulture-Forbidden, CicadaA-Forbidden, CicadaB-Forbidden,
