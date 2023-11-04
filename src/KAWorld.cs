@@ -221,26 +221,50 @@ namespace KarmaAppetite
         private List<string> hook_OWAI_DirectionFinder_StoryRegionPrioritys(On.OverseersWorldAI.DirectionFinder.orig_StoryRegionPrioritys orig, OverseersWorldAI.DirectionFinder self, SlugcatStats.Name saveStateNumber, string currentRegion, bool metMoon, bool metPebbles)
         {
             List<string> list = orig.Invoke(self, saveStateNumber, currentRegion, metMoon, metPebbles);
-            if (SlugcatStats.getSlugcatName(saveStateNumber) == "Pathfinder") //todo check
+            if (saveStateNumber == KABase.Pathfinder)
             {
-                list = new List<string>
+                //if (true) //v-pearl swallow/grab check
+                //{
+                    list = new List<string>
+                    {
+                        "SX",
+                        "LF",
+                        "SB",
+                        "SI",
+                        "DS",
+                        "SU",
+                        "VS",
+                        "DM",
+                        "SL",
+                        "GW",
+                        "SH",
+                        "HI",
+                        "CC",
+                        "UW",
+                        "RM"
+                    };
+                /*}
+                else
                 {
-                    "SX",
-                    "LF",
-                    "SB",
-                    "SI",
-                    "DS",
-                    "SU",
-                    "VS",
-                    "DM",
-                    "SL",
-                    "GW",
-                    "SH",
-                    "HI",
-                    "CC",
-                    "UW",
-                    "RM"
-                };
+                    list = new List<string>
+                    {
+                        "SX",
+                        "RM",
+                        "UW",
+                        "CC",
+                        "HI",
+                        "SH",
+                        "GW",
+                        "SL",
+                        "DM",
+                        "VS",
+                        "SU",
+                        "DS",
+                        "SI",
+                        "LF",
+                        "SB"
+                    };
+                }*/
             }
             return list;
         }

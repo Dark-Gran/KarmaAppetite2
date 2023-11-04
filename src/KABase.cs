@@ -19,6 +19,7 @@ namespace KarmaAppetite
 
         private const string MOD_ID = "darkgran.karmaappetite";
 
+
         //-------APPLY HOOKS-------
 
         private KAWorld kaWorldInstance = new KAWorld();
@@ -72,6 +73,9 @@ namespace KarmaAppetite
 
 
         //-------IMPLEMENTATION-------
+
+        public static readonly SlugcatStats.Name Pathfinder = new SlugcatStats.Name("Pathfinder", false);
+
 
         //---CONFIG MENU---
 
