@@ -29,8 +29,9 @@ namespace KarmaAppetite
             //Energy cell
             On.MoreSlugcats.MSCRoomSpecificScript.RM_CORE_EnergyCell.Update += hook_RM_CORE_EnergyCell;
             //Overseers
+            On.OverseerGraphics.DrawSprites += hook_OverseerGraphics_DrawSprites;
+            On.OverseerGraphics.ColorOfSegment += hook_OverseerGraphics_ColorOfSegment;
             On.WorldLoader.GeneratePopulation += hook_WorldLoader_GeneratePopulation;
-            On.OverseerAbstractAI.ctor += hook_OverseerAbstractAI_ctor;
             On.OverseersWorldAI.DirectionFinder.StoryRoomInRegion += hook_OWAI_DirectionFinder_StoryRoomInRegion;
             On.OverseersWorldAI.DirectionFinder.StoryRegionPrioritys += hook_OWAI_DirectionFinder_StoryRegionPrioritys;
             //Pearls
@@ -121,6 +122,27 @@ namespace KarmaAppetite
 
         //---OVERSEERS---
 
+        private Color overseerColor = new Color(0.7f, 0.6f, 0.5f);
+
+        private void hook_OverseerGraphics_DrawSprites(On.OverseerGraphics.orig_DrawSprites orig, OverseerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            if ((self.overseer.abstractCreature.abstractAI as OverseerAbstractAI).ownerIterator == 6)
+            {
+                sLeaser.sprites[self.GlowSprite].color = overseerColor;
+            }
+        }
+
+        private Color hook_OverseerGraphics_ColorOfSegment(On.OverseerGraphics.orig_ColorOfSegment orig, OverseerGraphics self, float f, float timeStacker)
+        {
+            Color orig_result = orig.Invoke(self, f, timeStacker);
+            if ((self.overseer.abstractCreature.abstractAI as OverseerAbstractAI).ownerIterator == 6)
+            {
+                return Color.Lerp(Color.Lerp(Custom.RGB2RGBA((overseerColor + new Color(0f, 0f, 1f) + self.earthColor * 8f) / 10f, 0.5f), Color.Lerp(overseerColor, Color.Lerp(self.NeutralColor, self.earthColor, Mathf.Pow(f, 2f)), self.overseer.SandboxOverseer ? 0.15f : 0.5f), self.ExtensionOfSegment(f, timeStacker)), Custom.RGB2RGBA(overseerColor, 0f), Mathf.Lerp(self.overseer.lastDying, self.overseer.dying, timeStacker));
+            }
+            return orig_result;
+        }
+
         private void hook_WorldLoader_GeneratePopulation(On.WorldLoader.orig_GeneratePopulation orig, WorldLoader self, bool fresh)
         {
             orig.Invoke(self, fresh);
@@ -129,19 +151,13 @@ namespace KarmaAppetite
                 int num2 = UnityEngine.Random.Range(self.world.region.regionParams.overseersMin, self.world.region.regionParams.overseersMax);
                 for (int num3 = 0; num3 < num2; num3++)
                 {
-                    self.world.offScreenDen.entitiesInDens.Add(new AbstractCreature(self.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Overseer), null, new WorldCoordinate(self.world.offScreenDen.index, -1, -1, 0), self.game.GetNewID()));
+                    AbstractCreature ac = new AbstractCreature(self.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Overseer), null, new WorldCoordinate(self.world.offScreenDen.index, -1, -1, 0), self.game.GetNewID());
+                    (ac.abstractAI as OverseerAbstractAI).ownerIterator = 4; //todo: not sure these actually appear, therefore left to white (change to 6 if ok)
+                    self.world.offScreenDen.entitiesInDens.Add(ac);
                 }
             }
         }
 
-        private void hook_OverseerAbstractAI_ctor(On.OverseerAbstractAI.orig_ctor orig, OverseerAbstractAI self, World world, AbstractCreature parent)
-        {
-            orig.Invoke(self, world, parent);
-            if (world.region.name == "SX")
-            {
-                self.ownerIterator = 4;
-            }
-        }
         private List<string> hook_OWAI_DirectionFinder_StoryRegionPrioritys(On.OverseersWorldAI.DirectionFinder.orig_StoryRegionPrioritys orig, OverseersWorldAI.DirectionFinder self, SlugcatStats.Name saveStateNumber, string currentRegion, bool metMoon, bool metPebbles)
         {
             List<string> list = orig.Invoke(self, saveStateNumber, currentRegion, metMoon, metPebbles);
