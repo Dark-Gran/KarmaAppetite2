@@ -8,7 +8,7 @@ SX_AI : SX_A01, SX_L01
 SX_A01 : SX_F01, SX_AI
 SX_F01 : SX_S01, SX_A01
 SX_S01 : SX_F01 : SHELTER
-SX_B02 : SX_D01, SX_S02, SX_B01, SX_A02
+SX_B02 : SX_S02, SX_B01, SX_D01, SX_A02
 SX_S02 : SX_B02 : SHELTER
 SX_A02 : SX_B02, GATE_SX_SB
 GATE_SX_SB : SX_A02, SB_B02 : GATE
@@ -18,7 +18,7 @@ CREATURES
 OFFSCREEN : 0-Vulture-1, 0-Scavenger-2
 SX_B01 : 3-Green
 SX_D01 : 3-CicadaB, 4-CicadaB, 5-Green, 6-PoleMimic
-SX_B02 : 4-BigSpider, 5-BigSpider
+SX_B02 : 4-BigSpider, 5-BigSpider, 6-BigSpider
 SX_A02 : 2-Centipede-{5}-2
 END CREATURES
 
