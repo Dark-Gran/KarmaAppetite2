@@ -12,12 +12,7 @@
 			"fade_in_start": 0,
 			"fade_out_start": 7.0,
 			"images": [
-				{
-					"name": "intro_pf",
-					"pos": [ 0, 0 ],
-					"depth": -1,
-					"shader": "Basic"
-				}
+				{ "name": "intro_pf", "pos": [ 0, 0 ], "depth": -1, "shader": "Normal" },
 			],
 			"camera_path": [
 				[ 10, 15, 0 ],
