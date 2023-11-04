@@ -29,8 +29,11 @@ namespace KarmaAppetite
             //Energy cell
             On.MoreSlugcats.MSCRoomSpecificScript.RM_CORE_EnergyCell.Update += hook_RM_CORE_EnergyCell;
             //Overseers
+            On.OverseerGraphics.ctor += hook_OverseerGraphics_ctor;
             On.OverseerGraphics.DrawSprites += hook_OverseerGraphics_DrawSprites;
             On.OverseerGraphics.ColorOfSegment += hook_OverseerGraphics_ColorOfSegment;
+            On.CoralBrain.Mycelium.UpdateColor += hook_CoralBrain_Mycelium_UpdateColor;
+            On.OverseerGraphics.HologramMatrix.DrawSprites += hook_OverseerGraphics_HologramMatrix_DrawSprites;
             On.WorldLoader.GeneratePopulation += hook_WorldLoader_GeneratePopulation;
             On.OverseersWorldAI.DirectionFinder.StoryRoomInRegion += hook_OWAI_DirectionFinder_StoryRoomInRegion;
             On.OverseersWorldAI.DirectionFinder.StoryRegionPrioritys += hook_OWAI_DirectionFinder_StoryRegionPrioritys;
@@ -44,7 +47,7 @@ namespace KarmaAppetite
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += hook_MoonConversation_AddEvents;
         }
 
-        
+
         //------IMPLEMENTATION------
 
         //---OE+LC REGIONS ACCESS---
@@ -124,6 +127,16 @@ namespace KarmaAppetite
         //---OVERSEERS---
 
         private Color overseerColor = new Color(0.7f, 0.6f, 0.5f);
+        private Color overseerMyceliumColor = new Color(0.9f, 0.44f, 0f);
+        private void hook_OverseerGraphics_ctor(On.OverseerGraphics.orig_ctor orig, OverseerGraphics self, PhysicalObject ow)
+        {
+            orig.Invoke(self, ow);
+            self.myceliaColor = overseerMyceliumColor;
+            for (int i = 0; i < self.mycelia.Length; i++)
+            {
+                self.mycelia[i].color = overseerMyceliumColor;
+            }
+        }
 
         private void hook_OverseerGraphics_DrawSprites(On.OverseerGraphics.orig_DrawSprites orig, OverseerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
@@ -132,6 +145,7 @@ namespace KarmaAppetite
             {
                 sLeaser.sprites[self.GlowSprite].color = overseerColor;
             }
+            sLeaser.sprites[self.WhiteSprite].color = Color.Lerp(self.ColorOfSegment(0.75f, timeStacker), overseerMyceliumColor, 0.5f);
         }
 
         private Color hook_OverseerGraphics_ColorOfSegment(On.OverseerGraphics.orig_ColorOfSegment orig, OverseerGraphics self, float f, float timeStacker)
@@ -142,6 +156,25 @@ namespace KarmaAppetite
                 return Color.Lerp(Color.Lerp(Custom.RGB2RGBA((overseerColor + new Color(0f, 0f, 1f) + self.earthColor * 8f) / 10f, 0.5f), Color.Lerp(overseerColor, Color.Lerp(self.NeutralColor, self.earthColor, Mathf.Pow(f, 2f)), self.overseer.SandboxOverseer ? 0.15f : 0.5f), self.ExtensionOfSegment(f, timeStacker)), Custom.RGB2RGBA(overseerColor, 0f), Mathf.Lerp(self.overseer.lastDying, self.overseer.dying, timeStacker));
             }
             return orig_result;
+        }
+
+        private void hook_CoralBrain_Mycelium_UpdateColor(On.CoralBrain.Mycelium.orig_UpdateColor orig, CoralBrain.Mycelium self, Color newColor, float gradientStart, int spr, RoomCamera.SpriteLeaser sLeaser)
+        {
+            orig.Invoke(self, newColor, gradientStart, spr, sLeaser);
+            self.color = overseerColor;
+            for (int j = 1; j < 3; j++)
+            {
+                (sLeaser.sprites[spr] as TriangleMesh).verticeColors[(sLeaser.sprites[spr] as TriangleMesh).verticeColors.Length - j] = overseerMyceliumColor;
+            }
+        }
+
+        private void hook_OverseerGraphics_HologramMatrix_DrawSprites(On.OverseerGraphics.HologramMatrix.orig_DrawSprites orig, OverseerGraphics.HologramMatrix self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
+            for (int j = 0; j < self.totalSprites; j++)
+            {
+                sLeaser.sprites[self.firstSprite + j].color = overseerColor;
+            }
         }
 
         private void hook_WorldLoader_GeneratePopulation(On.WorldLoader.orig_GeneratePopulation orig, WorldLoader self, bool fresh)
@@ -162,7 +195,7 @@ namespace KarmaAppetite
         {
             if (self.world.game.Players.Count > 0 && self.RelevantPlayer != null)
             {
-                if (self.RelevantPlayer.Room.name == "SX_D01" && !self.goToPlayer)
+                if (self.RelevantPlayer.Room.name == "SX_D01" && !self.goToPlayer && !self.playerGuide)
                 {
                     self.goToPlayer = true;
                     if (ModManager.MMF)
@@ -173,7 +206,7 @@ namespace KarmaAppetite
                     {
                         self.targetCreature = self.RelevantPlayer;
                     }
-                    self.playerGuideCounter = 1000;
+                    //self.playerGuideCounter = 1000;
                 }
             }
 
