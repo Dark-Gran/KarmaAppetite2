@@ -11,6 +11,7 @@ using MoreSlugcats;
 using SlugBase.DataTypes;
 using IL;
 using static KarmaAppetite.KABase;
+using SlugBase;
 
 namespace KarmaAppetite
 {
@@ -27,6 +28,11 @@ namespace KarmaAppetite
             On.SlugcatStats.getSlugcatOptionalRegions += hook_SlugcatStats_getSlugcatOptionalRegions;
             //Energy cell
             On.MoreSlugcats.MSCRoomSpecificScript.RM_CORE_EnergyCell.Update += hook_RM_CORE_EnergyCell;
+            //Overseers
+            On.WorldLoader.GeneratePopulation += hook_WorldLoader_GeneratePopulation;
+            On.OverseerAbstractAI.ctor += hook_OverseerAbstractAI_ctor;
+            On.OverseersWorldAI.DirectionFinder.StoryRoomInRegion += hook_OWAI_DirectionFinder_StoryRoomInRegion;
+            On.OverseersWorldAI.DirectionFinder.StoryRegionPrioritys += hook_OWAI_DirectionFinder_StoryRegionPrioritys;
             //Pearls
             On.StoryGameSession.ctor += hook_StoryGameSession_ctor;
             On.DataPearl.ApplyPalette += hook_DataPearl_ApplyPalette;
@@ -35,6 +41,7 @@ namespace KarmaAppetite
             On.SLOracleBehaviorHasMark.GrabObject += hook_SLOracleBehaviorHasMark_GrabObject;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += hook_MoonConversation_AddEvents;
         }
+
 
         //------IMPLEMENTATION------
 
@@ -114,7 +121,67 @@ namespace KarmaAppetite
 
         //---OVERSEERS---
 
+        private void hook_WorldLoader_GeneratePopulation(On.WorldLoader.orig_GeneratePopulation orig, WorldLoader self, bool fresh)
+        {
+            orig.Invoke(self, fresh);
+            if (self.world.region.name == "SX")
+            {
+                int num2 = UnityEngine.Random.Range(self.world.region.regionParams.overseersMin, self.world.region.regionParams.overseersMax);
+                for (int num3 = 0; num3 < num2; num3++)
+                {
+                    self.world.offScreenDen.entitiesInDens.Add(new AbstractCreature(self.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Overseer), null, new WorldCoordinate(self.world.offScreenDen.index, -1, -1, 0), self.game.GetNewID()));
+                }
+            }
+        }
 
+        private void hook_OverseerAbstractAI_ctor(On.OverseerAbstractAI.orig_ctor orig, OverseerAbstractAI self, World world, AbstractCreature parent)
+        {
+            orig.Invoke(self, world, parent);
+            if (world.region.name == "SX")
+            {
+                self.ownerIterator = 4;
+            }
+        }
+        private List<string> hook_OWAI_DirectionFinder_StoryRegionPrioritys(On.OverseersWorldAI.DirectionFinder.orig_StoryRegionPrioritys orig, OverseersWorldAI.DirectionFinder self, SlugcatStats.Name saveStateNumber, string currentRegion, bool metMoon, bool metPebbles)
+        {
+            List<string> list = orig.Invoke(self, saveStateNumber, currentRegion, metMoon, metPebbles);
+            if (SlugcatStats.getSlugcatName(saveStateNumber) == "Pathfinder") //todo check
+            {
+                list = new List<string>
+                {
+                    "SX",
+                    "LF",
+                    "SB",
+                    "SI",
+                    "DS",
+                    "SU",
+                    "VS",
+                    "DM",
+                    "SL",
+                    "GW",
+                    "SH",
+                    "HI",
+                    "CC",
+                    "UW",
+                    "RM"
+                };
+            }
+            return list;
+        }
+
+        private string hook_OWAI_DirectionFinder_StoryRoomInRegion(On.OverseersWorldAI.DirectionFinder.orig_StoryRoomInRegion orig, OverseersWorldAI.DirectionFinder self, string currentRegion, bool metMoon)
+        {
+            string orig_result = orig.Invoke(self, currentRegion, metMoon);
+            if (currentRegion == "SX")
+            {
+                return "SX_D01";
+            }
+            else if (currentRegion == "RM")
+            {
+                return "RM_COREPF";
+            }
+            return orig_result;
+        }
 
         //---DATA PEARLS--- (enums added in Base)
 
