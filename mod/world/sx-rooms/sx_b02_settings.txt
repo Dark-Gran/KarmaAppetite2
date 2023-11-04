@@ -1,3 +1,4 @@
 Template: SX_SettingsTemplate_Inside
 DangerType: FloodAndRain
+PlacedObjects: DataPearl><75.56793><766.6604><27~25~0~0~Misc~0, 
 FadePalette: 2, 0.7065217, 0.7065217

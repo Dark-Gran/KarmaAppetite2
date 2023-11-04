@@ -125,20 +125,6 @@ namespace KarmaAppetite
             }
         }
 
-        private Color? hook_DataPearl_UniquePearlHighLightColor(On.DataPearl.orig_UniquePearlHighLightColor orig, DataPearl.AbstractDataPearl.DataPearlType pearlType)
-        {
-            Color? orig_result = orig.Invoke(pearlType);
-            if (pearlType == KarmaAppetiteEnums.KAType.CorruptionPearl)
-            {
-                return new Color(0.416f, 0.62f, 1f);
-            }
-            if (pearlType == KarmaAppetiteEnums.KAType.VoidPearl)
-            {
-                return new Color(1f, 0.55f, 0f);
-            }
-            return orig_result;
-        }
-
         private Color hook_DataPearl_UniquePearlMainColor(On.DataPearl.orig_UniquePearlMainColor orig, DataPearl.AbstractDataPearl.DataPearlType pearlType)
         {
             Color orig_result = orig.Invoke(pearlType);
@@ -148,7 +134,7 @@ namespace KarmaAppetite
             }
             if (pearlType == KarmaAppetiteEnums.KAType.CorruptionPearl)
             {
-                return new Color(0.173f, 0.337f, 1f);
+                return new Color(0f, 0.12f, 0.63f);
             }
             if (pearlType == KarmaAppetiteEnums.KAType.VoidPearl)
             {
@@ -157,9 +143,19 @@ namespace KarmaAppetite
             return orig_result;
         }
 
-        //Halo if swallowed Voidpearl
-
-
+        private Color? hook_DataPearl_UniquePearlHighLightColor(On.DataPearl.orig_UniquePearlHighLightColor orig, DataPearl.AbstractDataPearl.DataPearlType pearlType)
+        {
+            Color? orig_result = orig.Invoke(pearlType);
+            if (pearlType == KarmaAppetiteEnums.KAType.CorruptionPearl)
+            {
+                return new Color(0.043f, 0.318f, 1f);
+            }
+            if (pearlType == KarmaAppetiteEnums.KAType.VoidPearl)
+            {
+                return new Color(1f, 0.55f, 0f);
+            }
+            return orig_result;
+        }
 
         //Conversations
         private void hook_SLOracleBehaviorHasMark_GrabObject(On.SLOracleBehaviorHasMark.orig_GrabObject orig, SLOracleBehaviorHasMark self, PhysicalObject item)
