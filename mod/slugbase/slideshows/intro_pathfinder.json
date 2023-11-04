@@ -1,0 +1,28 @@
+{
+	"id": "Intro_Pathfinder",
+	"slideshow_folder": "scenes/intro - pathfinder",
+	"next_process": "Game",
+	"music": {
+		"name": "RW_Intro_Theme",
+		"fade_in": 40
+	},
+	"scenes": [
+		{
+			"name": "scene1",
+			"fade_in_start": 0,
+			"fade_out_start": 7.0,
+			"images": [
+				{
+					"name": "intro_pf",
+					"pos": [ 0, 0 ],
+					"depth": -1,
+					"shader": "Basic"
+				}
+			],
+			"camera_path": [
+				[ 10, 15, 0 ],
+				[ 8.7, 5, 0.5 ]
+			]
+		}
+	]
+}

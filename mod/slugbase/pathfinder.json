@@ -8,6 +8,7 @@
 		"select_menu_scene": "Slugcat_Pathfinder",
 		"select_menu_scene_ascended": "Slugcat_Pathfinder",
 		"sleep_scene": "Sleep_Pathfinder",
+		"intro_slideshow": "Intro_Pathfinder",
 
 		"back_spear": true,
 		"karma": 6,
