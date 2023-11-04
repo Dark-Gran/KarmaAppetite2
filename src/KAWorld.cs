@@ -161,10 +161,15 @@ namespace KarmaAppetite
         private void hook_CoralBrain_Mycelium_UpdateColor(On.CoralBrain.Mycelium.orig_UpdateColor orig, CoralBrain.Mycelium self, Color newColor, float gradientStart, int spr, RoomCamera.SpriteLeaser sLeaser)
         {
             orig.Invoke(self, newColor, gradientStart, spr, sLeaser);
-            self.color = overseerColor;
-            for (int j = 1; j < 3; j++)
+            bool inSX = self.owner.OwnerRoom.abstractRoom.subregionName == "Solemn Quarry" || self.owner.OwnerRoom.abstractRoom.subregionName == "Two Colors of Smoke";
+            bool isOverseer = self.owner is OverseerGraphics && (self.owner as OverseerGraphics).overseer.abstractCreature.abstractAI is OverseerAbstractAI;
+            if ((inSX && !isOverseer) || (isOverseer && ((self.owner as OverseerGraphics).overseer.abstractCreature.abstractAI as OverseerAbstractAI).ownerIterator == 6))
             {
-                (sLeaser.sprites[spr] as TriangleMesh).verticeColors[(sLeaser.sprites[spr] as TriangleMesh).verticeColors.Length - j] = overseerMyceliumColor;
+                self.color = overseerColor;
+                for (int j = 1; j < 3; j++)
+                {
+                    (sLeaser.sprites[spr] as TriangleMesh).verticeColors[(sLeaser.sprites[spr] as TriangleMesh).verticeColors.Length - j] = overseerMyceliumColor;
+                }
             }
         }
 
