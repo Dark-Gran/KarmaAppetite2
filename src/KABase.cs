@@ -186,7 +186,7 @@ namespace KarmaAppetite
 
             //Saint-Hair
 
-            if (!optionsInstance.noHair.Value) 
+            if (!optionsInstance.noHair.Value && (self.owner as Player).slugcatStats.name == Pathfinder) 
             {
                 
                 int hair_num = 0;
