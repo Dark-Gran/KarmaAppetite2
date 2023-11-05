@@ -1,12 +1,11 @@
 Template: SX_SettingsTemplate_Superstructure
 DangerType: None
 BkgDroneVolume: 0.326087
-RandomItemDensity: 0.5108696
-RandomItemSpearChance: 0.2173913
+RandomItemDensity: 0.0
+RandomItemSpearChance: 0.0
 Palette: 3
 EffectColorA: 13
 EffectColorB: 15
-Effects: Bloom-0-20-20, ZeroG-0.5108696-22-79, ZeroGSpecks-0.3043478-21-140, SSSwarmers-0-30-30, ProjectedScanLines-0-40-40, SuperStructureProjector-0-50-50, 
-PlacedObjects: LightSource><533.6611><459.9292><1~Environment~-15~104~50~86.60254~1~0~None~0~0, LightSource><861.3159><250.9217><1~Environment~-21~109~50~86.60254~1~0~None~0~0, LightSource><771.8677><655.6001><1~Environment~0~100~50~86.60254~1~0~None~0~0, LightFixture><723.8633><459.3961><RedLight~17.32051~-10~71, 
-AmbientSounds: OMNI><AM_IND-SuperStructure.ogg><831.852><650.0779><0.3478261><0.9413043, SPOT><SO_IND-Turbine.ogg><655.3505><615.3828><0.4347826><1><551.3505><160.3828><-177.3553><-116.3553><0><0.5239132, SPOT><SO_IND-FlourLight.ogg><755.9495><255.2359><0.25><1><712.9495><447.2359><-34.35535><-50.35535><0><0.2847827, 
-FadePalette: 2, 0.7
+Effects: SunBlock-1-14-118, ZeroG-1-18-57 
+PlacedObjects: LightSource><251.8286><590.934><1~Environment~490~-491~-391~-20.39746~0~0, LightSource><747.3002><92.24152><1~Environment~-497~521~-74~-88.39747~0~0, LightSource><233.0621><104.3183><1~Environment~515~512~50~86.60254~0~0, LightSource><757.9443><591.9521><1~Environment~-520~-512~107~16.60254~0~0, 
+AmbientSounds: OMNI><AM_IND-SuperStructure.ogg><828.1998><653.0092><0.4021739><0.7456522, OMNI><AM_WIN-StrongWnd2.ogg><649.244><654.55><0.3695652><1, OMNI><SO_SFX-DataTrans2.ogg><828.8108><578.3148><0.2608696><0.8434783, 

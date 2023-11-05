@@ -16,7 +16,7 @@
 		"karma_cap": 6,
 		"the_mark": true,
 		"the_glow": false,
-		"start_room": "SX_B01",
+		"start_room": "SX_AI",
 		"guide_overseer": 6,
 		"has_dreams": true,
 		"use_default_dreams": false,
