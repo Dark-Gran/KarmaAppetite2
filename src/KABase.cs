@@ -1021,5 +1021,15 @@ namespace KarmaAppetite
             }
         }
 
+
+        //---UTILITIES---
+
+        public static Vector2 ClampVector(Vector2 v, float x0, float x1, float y0, float y1)
+        {
+            v.x = Mathf.Clamp(v.x, x0, x1);
+            v.y = Mathf.Clamp(v.y, y0, y1);
+            return v;
+        }
+
     }
 }

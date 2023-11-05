@@ -401,7 +401,7 @@ namespace KarmaAppetite
         private void OracleHooks()
         {
             On.Room.ReadyForAI += SpawnOracle;
-            On.OracleGraphics.Gown.Color += SXOracleGraphics.SRSGown.SRSColor;
+            On.OracleGraphics.Gown.Color += SXOracleGraphics.SXGown.SXColor;
             On.Oracle.Update += SXOracle.Update;
             On.Oracle.OracleArm.Update += SXOracleArm.ArmUpdate;
             On.Oracle.SetUpSwarmers += SXOracle.SetUpSwarmers;
@@ -411,6 +411,10 @@ namespace KarmaAppetite
 
         public SXOracle oracle;
         public static float talkHeight = 0f;
+
+        public static Color oracleColor = new Color(0.3f, 0.3f, 0.3f);
+        public static Color oracleGownColor1 = new Color(0.1f, 0.1f, 0.1f);
+        public static Color oracleGownColor2 = new Color(1.0f, 1.0f, 1.0f);
 
         private void SpawnOracle(On.Room.orig_ReadyForAI orig, Room self)
         {
@@ -462,7 +466,6 @@ namespace KarmaAppetite
                 this.bodyChunkConnections = new PhysicalObject.BodyChunkConnection[1];
                 this.bodyChunkConnections[0] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[0], base.bodyChunks[1], 9f, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
                 this.mySwarmers = new List<OracleSwarmer>();
-                //base.airFriction = 0.99f;
 
 
                 this.oracleBehavior = new SXOracleBehavior(this);
@@ -564,21 +567,21 @@ namespace KarmaAppetite
             {
                 if (self.oracle is SXOracle)
                 {
-                    SXOracle cMOracle = (SXOracle)self.oracle;
+                    SXOracle sxOracle = (SXOracle)self.oracle;
                     float num = 1f / 240f;
                     self.oracle.bodyChunks[1].vel *= 0.4f;
                     self.oracle.bodyChunks[0].vel *= 0.4f;
-                    self.oracle.bodyChunks[0].vel += Vector2.ClampMagnitude(cMOracle.oracleBehavior.OracleGetToPos - cMOracle.bodyChunks[0].pos, 100f) / 100f * 6.2f;
-                    self.oracle.bodyChunks[1].vel += Vector2.ClampMagnitude(cMOracle.oracleBehavior.OracleGetToPos - cMOracle.oracleBehavior.GetToDir * cMOracle.bodyChunkConnections[0].distance - cMOracle.bodyChunks[0].pos, 100f) / 100f * 3.2f * num;
+                    self.oracle.bodyChunks[0].vel += Vector2.ClampMagnitude(sxOracle.oracleBehavior.OracleGetToPos - sxOracle.bodyChunks[0].pos, 100f) / 100f * 6.2f;
+                    self.oracle.bodyChunks[1].vel += Vector2.ClampMagnitude(sxOracle.oracleBehavior.OracleGetToPos - sxOracle.oracleBehavior.GetToDir * sxOracle.bodyChunkConnections[0].distance - sxOracle.bodyChunks[0].pos, 100f) / 100f * 3.2f * num;
 
-                    Vector2 baseGetToPos = cMOracle.oracleBehavior.BaseGetToPos;
+                    Vector2 baseGetToPos = sxOracle.oracleBehavior.BaseGetToPos;
 
                     Vector2 vector = new Vector2(Mathf.Clamp(baseGetToPos.x, self.cornerPositions[0].x, self.cornerPositions[1].x), self.cornerPositions[0].y);
 
                     float num2 = Vector2.Distance(vector, baseGetToPos);
                     float num3 = Mathf.InverseLerp(self.cornerPositions[0].x, self.cornerPositions[1].x, baseGetToPos.x);
 
-                    self.baseMoving = (Vector2.Distance(self.BasePos(1f), vector) > (self.baseMoving ? 50f : 350f) && cMOracle.oracleBehavior.consistentBasePosCounter > 30);
+                    self.baseMoving = (Vector2.Distance(self.BasePos(1f), vector) > (self.baseMoving ? 50f : 350f) && sxOracle.oracleBehavior.consistentBasePosCounter > 30);
                     self.lastFramePos = self.framePos;
                     if (self.baseMoving)
                     {
@@ -632,13 +635,12 @@ namespace KarmaAppetite
                     return base.owner as SXOracle;
                 }
             }
-            public bool IsSuns = true;
-
-            public int sigilSprite;
 
             public int sunFinL, sunFinR;
 
             public static ArmBase staticCheckArmBase;
+
+            private int subHalo = -1;
 
             public SXOracleGraphics(PhysicalObject ow, SXOracle oracle) : base(ow)
             {
@@ -666,16 +668,12 @@ namespace KarmaAppetite
 
                 this.halo = null;// new OracleGraphics.Halo(this, this.totalSprites);
 
-                /*if (this.bodyJson.gown != null)
-                {
-                    this.gown = new OracleGraphics.Gown(this);
-                    this.robeSprite = this.totalSprites;
-                    this.totalSprites++;
-                }
-                else
-                {*/
-                this.gown = null;
-                //}
+                this.subHalo = this.totalSprites;
+                this.totalSprites++;
+
+                this.gown = new OracleGraphics.Gown(this);
+                this.robeSprite = this.totalSprites;
+                this.totalSprites++;
 
                 this.firstHandSprite = this.totalSprites;
                 this.totalSprites += 4;
@@ -725,7 +723,6 @@ namespace KarmaAppetite
                 this.SLArmBaseColB = palette.texture.GetPixel(5, 1);
                 this.SLArmHighLightColB = palette.texture.GetPixel(5, 2);
 
-                Color oracleColor = Color.yellow;
                 for (int j = 0; j < base.owner.bodyChunks.Length; j++)
                 {
                     sLeaser.sprites[this.firstBodyChunkSprite + j].color = oracleColor; //torso
@@ -812,6 +809,10 @@ namespace KarmaAppetite
                 {
                     this.armBase.InitiateSprites(sLeaser, rCam);
                 }
+
+                sLeaser.sprites[this.subHalo] = new FSprite("halo", true);
+                sLeaser.sprites[this.subHalo].color = Color.white;
+
                 sLeaser.sprites[this.neckSprite] = new FSprite("pixel", true);
                 sLeaser.sprites[this.neckSprite].scaleX = 3f;
                 sLeaser.sprites[this.neckSprite].anchorY = 0f;
@@ -947,7 +948,6 @@ namespace KarmaAppetite
                         this.umbCord.Update();
                     }
 
-                    // voice?
                 }
 
             }
@@ -955,60 +955,22 @@ namespace KarmaAppetite
             public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
             {
                 base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
-                //this.armBase.DrawSprites(sLeaser, rCam, timeStacker, camPos);
-                // this function lets the orig draw sprites function do its thing, then we fix its issues here
-                // sLeaser.sprites[this.killSprite].isVisible = false;
-                Vector2 sunSpritePos = new Vector2(sLeaser.sprites[this.firstHeadSprite].x, sLeaser.sprites[this.firstHeadSprite].y);
-
-
-                Vector2 bodyVector = Vector2.Lerp(base.owner.firstChunk.lastPos, base.owner.firstChunk.pos, timeStacker);
-                Vector2 headVector = Vector2.Lerp(this.head.lastPos, this.head.pos, timeStacker);
-                Vector2 vector6 = Custom.DirVec(headVector, bodyVector); // subtracts both vectors?
-                Vector2 vector7 = Custom.PerpendicularVector(vector6); // flips vector across-wise (horizontally?)
-                Vector2 lookVector = this.RelativeLookDir(timeStacker); // direction oracle is looking
-
-                // moon sigil graphic scale y works because it is above the zero point of the lookVector.y (aka middle of oracle head)
-                // we offset the scaleY calcs by 1f so we get what we want
-
-                // sLeaser.sprites[this.sunFinL].x = (sunVector.x - camPos.x);
-                // sLeaser.sprites[this.sunFinL].y = (sunVector.y - camPos.y) + 1f;
-                // sLeaser.sprites[this.sunFinL].rotation = Custom.AimFromOneVectorToAnother(sunVector, headVector - vector6 * 10f);
-                //// sLeaser.sprites[this.sunFinL].scaleX = Custom.LerpMap(lookVector.x + 0.5f, 0.8f, 0f, 0.4f, 0f);
-                // //TestMod.Logger.LogWarning(lookVector.x);
-                //// sLeaser.sprites[this.sunFinL].scaleY = Custom.LerpMap(lookVector.y + 0.2f, 0.8f, 0f, 1f, 0f); 
-
-                // sLeaser.sprites[this.sunFinR].x = (sunVector.x - camPos.x);
-                // sLeaser.sprites[this.sunFinR].y = (sunVector.y - camPos.y) + 1f;
-                // sLeaser.sprites[this.sunFinR].rotation = Custom.AimFromOneVectorToAnother(sunVector, headVector - vector6 * 10f);
-                // sLeaser.sprites[this.sunFinR].scaleX = -Mathf.Lerp(1f, 0f, lookVector.x);
-                // float scaleY = Mathf.Lerp(0f, 1f, lookVector.y + 0.5f);
-                // sLeaser.sprites[this.sunFinR].scaleY = (scaleY >= 0f) ? scaleY : 0f;
-                // TestMod.Logger.LogWarning(lookVector.y);
-                // TestMod.Logger.LogWarning(scaleY);
-
-                // looking up
-                // 1f = full scale 1f
-                // 0.9f = 
-
+                sLeaser.sprites[subHalo].x = this.head.pos.x - camPos.x;
+                sLeaser.sprites[subHalo].y = this.head.pos.y - camPos.y + 4f;
             }
 
-            public class SRSGown
+            public class SXGown
             {
-                public static Color SRSColor(On.OracleGraphics.Gown.orig_Color orig, OracleGraphics.Gown self, float f)
+                public static Color SXColor(On.OracleGraphics.Gown.orig_Color orig, OracleGraphics.Gown self, float f)
                 {
                     Color origRes = orig(self, f);
 
                     if (self.owner.oracle is SXOracle)
                     {
-                        SXOracle cmOracle = (SXOracle)self.owner.oracle;
+                        SXOracle sxOracle = (SXOracle)self.owner.oracle;
 
-                        //gradient
-                        /*return Custom.HSL2RGB(
-                            Mathf.Lerp(gownColor.from.h, gownColor.to.h, Mathf.Pow(f, 2f)),
-                            Mathf.Lerp(gownColor.from.s, gownColor.to.s, f),
-                            Mathf.Lerp(gownColor.from.s, gownColor.to.s, f)
-                        );*/
-                        return Color.black;
+                        return Color.Lerp(oracleGownColor1, oracleGownColor2, Mathf.Pow(f*0.5f, 2f)); //gradient
+                        //return oracleGownColor1;
 
                     }
                     else
@@ -1038,10 +1000,6 @@ namespace KarmaAppetite
             public float roomGravity; // enable force gravity to use
 
             public SXOracleMovement movementBehavior;
-
-
-            //public List<CMOracleSubBehavior> allSubBehaviors;
-            //public CMOracleSubBehavior currSubBehavior;
 
             public new SXOracle oracle;
 
@@ -1099,8 +1057,6 @@ namespace KarmaAppetite
                 this.lastPos = oracle.firstChunk.pos;
                 this.nextPos = oracle.firstChunk.pos;
                 this.pathProgression = 1f;
-                //this.allSubBehaviors = new List<CMOracleSubBehavior>();
-                //this.currSubBehavior = new CMOracleSubBehavior.NoSubBehavior(this);
 
                 this.investigateAngle = UnityEngine.Random.value * 360f;
                 this.working = 1f;
@@ -1109,8 +1065,8 @@ namespace KarmaAppetite
                 this.action = SXOracleAction.generalIdle;
                 this.playerOutOfRoomCounter = 1;
 
-                // move?
-                this.SetNewDestination(this.oracle.room.RandomPos()); //startPos
+                // move
+                this.SetNewDestination(KABase.ClampVector(this.oracle.room.RandomPos(), 300f, 1200f, 300f, 1200f));
                 
                 this.investigateAngle = 0f;
                 this.lookPoint = this.lookPoint = this.oracle.firstChunk.pos + new Vector2(0f, -40f);
