@@ -154,6 +154,8 @@ namespace KarmaAppetite
 
         private int haloSpriteIndex = -1;
         private const bool HALO_BEHIND_SLUGCAT = true;
+        private const float HALO_OFFSET_Y = 5f;
+        private Color haloColor = new Color(1f, 0.7f, 0.2f);
 
         private void hook_PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
@@ -180,9 +182,9 @@ namespace KarmaAppetite
 
             //Halo update
             sLeaser.sprites[haloSpriteIndex].x = self.head.pos.x - camPos.x;
-            sLeaser.sprites[haloSpriteIndex].y = self.head.pos.y - camPos.y;
-            sLeaser.sprites[haloSpriteIndex].color = Color.white;
-            sLeaser.sprites[haloSpriteIndex].isVisible = SwallowedVoidPearl(self.player);
+            sLeaser.sprites[haloSpriteIndex].y = self.head.pos.y - camPos.y + HALO_OFFSET_Y;
+            sLeaser.sprites[haloSpriteIndex].color = haloColor;
+            sLeaser.sprites[haloSpriteIndex].isVisible = SwallowedVoidPearl(self.player);// || Input.GetKey(KeyCode.W);
 
             //Saint-Hair
 
