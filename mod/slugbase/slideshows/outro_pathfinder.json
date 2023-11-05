@@ -1,0 +1,47 @@
+{
+	"id": "Outro_Pathfinder",
+	"slideshow_folder": "scenes/outro - pathfinder",
+	"next_process": "Statistics",
+	"music": {
+		"name": "RW_Outro_Theme",
+		"fade_in": 40
+	},
+	"scenes": [
+		{
+			"name": "scene1",
+			"fade_in_start": 0,
+			"fade_out_start": 8.0,
+			"images": [
+				{ "name": "outro_0", "pos": [ 0, 0 ], "depth": -1, "shader": "Normal" },
+			],
+			"camera_path": [
+				[ 10, 15, 0 ],
+				[ 8.7, 5, 0.5 ]
+			]
+		},
+		{
+			"name": "scene2",
+			"fade_in_start": 9.0,
+			"fade_out_start": 18.0,
+			"images": [
+				{ "name": "outro_1", "pos": [ 0, 0 ], "depth": -1, "shader": "Normal" },
+			],
+			"camera_path": [
+				[ 10, 15, 0 ],
+				[ 8.7, 5, 0.5 ]
+			]
+		},
+		{
+			"name": "scene3",
+			"fade_in_start": 19.0,
+			"fade_out_start": 29.0,
+			"images": [
+				{ "name": "outro_2", "pos": [ 0, 0 ], "depth": -1, "shader": "Normal" },
+			],
+			"camera_path": [
+				[ 10, 15, 0 ],
+				[ 8.7, 5, 0.5 ]
+			]
+		}
+	]
+}
