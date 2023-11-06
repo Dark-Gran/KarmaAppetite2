@@ -124,8 +124,6 @@ namespace KarmaAppetite
                 public static Conversation.ID Moon_Pearl_TCoS;
                 public static Conversation.ID Moon_Pearl_Corruption;
                 public static Conversation.ID Moon_Pearl_Void;
-                //Iterator
-                public static Oracle.OracleID SX;
 
 
 
@@ -138,7 +136,6 @@ namespace KarmaAppetite
                     Moon_Pearl_TCoS = new Conversation.ID("Moon_Pearl_TCoS", true);
                     Moon_Pearl_Corruption = new Conversation.ID("Moon_Pearl_Corruption", true);
                     Moon_Pearl_Void = new Conversation.ID("Moon_Pearl_Void", true);
-                    SX = new Oracle.OracleID("SX", true);
                 }
 
                 public static void UnregisterValues()
@@ -150,7 +147,6 @@ namespace KarmaAppetite
                     if (Moon_Pearl_TCoS != null) { Moon_Pearl_TCoS.Unregister(); Moon_Pearl_TCoS = null; }
                     if (Moon_Pearl_Corruption != null) { Moon_Pearl_Corruption.Unregister(); Moon_Pearl_Corruption = null; }
                     if (Moon_Pearl_Void != null) { Moon_Pearl_Void.Unregister(); Moon_Pearl_Void = null; }
-                    if (SX != null) { SX.Unregister(); SX = null; }
                 }
             }
         }
