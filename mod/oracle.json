@@ -86,6 +86,18 @@
           "hold": 5,
           "wait": 5,
           "texts": [ "Hello <PlayerName>.", "This is our SECOND dialog." ]
+        },
+        {
+          "event": "addedCorruptionPearl",
+          "hold": 5,
+          "wait": 5,
+          "texts": [ "Yes, that's one." ]
+        },
+        {
+          "event": "finishedCorruptionPearls",
+          "hold": 5,
+          "wait": 5,
+          "texts": [ "Now there's two, here is the result." ]
         }
       ],
       "pearls": [
