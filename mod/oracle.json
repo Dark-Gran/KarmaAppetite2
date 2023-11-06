@@ -1,0 +1,60 @@
+[
+  {
+    "id": "CustomOracle",
+    "roomId": "SX_AI",
+    "gravity": 0.9,
+    "airFriction": 0.99,
+    "swarmers": 0,
+    "annoyedScore": 10,
+    "angryScore": 0,
+    "talkHeight": 0,
+    "pearlFallback": "pebbles",
+    "cornerPositions": [
+      {
+        "x": 7,
+        "y": 35
+      },
+      {
+        "x": 35,
+        "y": 35
+      },
+      {
+        "x": 35,
+        "y": 5
+      },
+      {
+        "x": 7,
+        "y": 5
+      }
+    ],
+    "body": {
+      "oracleColor": {
+        "r": 0.5,
+        "g": 0.1,
+        "b": 0.0
+      },
+      "gown": {
+        "color": {
+          "type": "gradient",
+          "from": {
+            "h": 0.0,
+            "s": 0.0,
+            "l": 0.0
+          },
+          "to": {
+            "h": 0.2,
+            "s": 0.5,
+            "l": 1.0
+          }
+        }
+      },
+      "sigil": null,
+      "eyes": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 1
+      }
+    }
+  }
+]
