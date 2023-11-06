@@ -27,16 +27,6 @@
         "y": 5
       }
     ],
-    "spawnBounds": [
-      {
-        "x": 300,
-        "y": 300
-      },
-      {
-        "x": 1200,
-        "y": 1200
-      }
-    ],
     "body": {
       "oracleColor": {
         "r": 0.3,
@@ -45,7 +35,7 @@
       },
       "gown": {
         "color": {
-          "type": "gradient2",
+          "type": "gradient",
           "from": {
             "h": 0.2,
             "s": 0.01,
@@ -58,12 +48,6 @@
           }
         }
       },
-      "subhalo": {
-        "sprite": "halo",
-        "r": 1,
-        "g": 1,
-        "b": 1
-      },
       "sigil": null,
       "eyes": {
         "r": 0,
@@ -71,29 +55,6 @@
         "b": 0,
         "a": 1
       }
-    },
-    "events": {
-      "generic": [
-        {
-          "event": "playerEnterNeverMet",
-          "hold": 5,
-          "wait": 5,
-          "texts": [ "Hello <PlayerName>.", "This is our FIRST dialog." ],
-          "action": "saveMetCM"
-        },
-        {
-          "event": "playerEnter",
-          "hold": 5,
-          "wait": 5,
-          "texts": [ "Hello <PlayerName>.", "This is our SECOND dialog." ]
-        }
-      ],
-      "pearls": [
-        {
-          "item": "Misc",
-          "texts": [ "This is where the white pearl dialogs go." ]
-        }
-      ]
     }
   }
 ]
