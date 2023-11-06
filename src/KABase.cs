@@ -156,7 +156,7 @@ namespace KarmaAppetite
 
         private int haloSpriteIndex = -1;
         private const bool HALO_BEHIND_SLUGCAT = true;
-        private const float HALO_OFFSET_Y = 5f;
+        private const float HALO_OFFSET_Y = 5.2f;
         private Color haloColor = new Color(1f, 0.7f, 0.2f);
 
         private void hook_PlayerGraphics_InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
@@ -282,7 +282,7 @@ namespace KarmaAppetite
 
         private static bool ShouldGlow(int karma, int food, Player plr=null)
         {
-            return SwallowedVoidPearl(plr) || optionsInstance.alwaysGlow.Value || (karma >= KABase.STARTING_MAX_KARMA && food != 0);
+            return SwallowedVoidPearl(plr) || optionsInstance.alwaysGlow.Value || (karma >= STARTING_MAX_KARMA && food != 0);
         }
 
         private void hook_OracleSwarmer_BitByPlayer(On.OracleSwarmer.orig_BitByPlayer orig, OracleSwarmer self, Creature.Grasp grasp, bool eu)
@@ -330,7 +330,6 @@ namespace KarmaAppetite
             KarmaToFood(self.characterStats, self.saveState.deathPersistentSaveData.karma);
             FoodToStats(self.characterStats, self.saveState.food, null, self.saveState.deathPersistentSaveData.karma >= 9); //Note: missing SwallowedVoidPearl check - ok because refresh after load? THEREFORE Deprecated? Needs a test.
             self.saveState.theGlow = ShouldGlow(self.saveState.deathPersistentSaveData.karma, self.saveState.food); //Same as the line above (= missing check: deprecated?)
-            RefreshAllPlayers(self);
         }
 
         private void RefreshAllPlayers(StoryGameSession session)
@@ -441,11 +440,11 @@ namespace KarmaAppetite
             orig.Invoke(self, spear);
             spear.spearDamageBonus = 0.25f + ((self.playerState.foodInStomach / (FOOD_POTENTIAL / 10)) * (GetsHighestKarmaBonus(self) ? 1f : 0.5f));
             BodyChunk firstChunk2 = spear.firstChunk;
-            float speedBoost = 0.73f + (self.playerState.foodInStomach / 12);
+            float speedBoost = 0.95f + (self.playerState.foodInStomach / 12);
             if (SwallowedVoidPearl(self)) //Void Pearl bonus
             {
                 spear.spearDamageBonus += 1f;
-                speedBoost += 0.3f;
+                speedBoost += 0.1f;
             }
             if (speedBoost < 1f && self.playerState.foodInStomach > 0) { speedBoost = 1f; }
             firstChunk2.vel.x = firstChunk2.vel.x * speedBoost;
@@ -575,7 +574,7 @@ namespace KarmaAppetite
 
             if (!orig_result && obj is Spear && (obj as Spear).mode == Weapon.Mode.StuckInWall)
             {
-                return self.FoodInStomach >= DISLODGE_FOOD;
+                return self.FoodInStomach >= DISLODGE_FOOD || self.Karma >= STARTING_MAX_KARMA;
             }
 
             return orig_result;
@@ -746,7 +745,7 @@ namespace KarmaAppetite
                         PayDay(self, 4);
                         break;
                     }
-                    if (GetsHighestKarmaBonus(self) && ((physicalObject is OracleSwarmer && physicalObject2 is OracleSwarmer) || (physicalObject is KarmaFlower && physicalObject2 is OverseerCarcass)) && CanAffordCraft(self, 4)) //Neuron + Neuron OR Overseer + KarmaFlower = SingularityBomb
+                    if (GetsHighestKarmaBonus(self) && ((physicalObject is OracleSwarmer || physicalObject2 is OverseerCarcass)  && (physicalObject is KarmaFlower || physicalObject2 is OracleSwarmer)) && CanAffordCraft(self, 4)) //Neuron/KarmaFlower + Neuron/Overseer = SingularityBomb (with Highest Karma Bonus only)
                     {
                         newItem = SpawnObject(self, MoreSlugcatsEnums.AbstractObjectType.SingularityBomb, room, self.abstractCreature.pos, "");
                         PayDay(self, 4);

@@ -39,9 +39,9 @@
     ],
     "body": {
       "oracleColor": {
-        "r": 0.3,
-        "g": 0.3,
-        "b": 0.3
+        "r": 0.2,
+        "g": 0.2,
+        "b": 0.2
       },
       "gown": {
         "color": {
@@ -78,7 +78,14 @@
           "event": "playerEnterNeverMet",
           "hold": 5,
           "wait": 5,
-          "texts": [ "Hello <PlayerName>.", "This is our FIRST dialog." ],
+          "texts": [ "Hello <PlayerName>.", "Here is some substance." ],
+          "action": "giveFood"
+        },
+        {
+          "event": "playerEnterNeverMet",
+          "hold": 5,
+          "wait": 5,
+          "texts": [ "This was our FIRST dialog." ],
           "action": "saveMetCM"
         },
         {

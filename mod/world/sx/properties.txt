@@ -5,8 +5,8 @@ batDepleteCyclesMaxIfLessThanTwoLeft: 3
 batDepleteCyclesMaxIfLessThanFiveLeft: 4
 batsPerActiveSwarmRoom: 7
 overseersSpawnChance: 1.0
-overseersMin: 3
-overseersMax: 5
+overseersMin: 2
+overseersMax: 4
 playerGuideOverseerSpawnChance: 0.5
 Subregion: Solemn Quarry
 Subregion: Two Colors of Smoke
