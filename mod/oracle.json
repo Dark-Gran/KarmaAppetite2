@@ -48,6 +48,12 @@
           }
         }
       },
+      "subhalo": {
+        "sprite": "halo",
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
       "sigil": null,
       "eyes": {
         "r": 0,
