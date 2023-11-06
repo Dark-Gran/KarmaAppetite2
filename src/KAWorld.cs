@@ -135,7 +135,7 @@ namespace KarmaAppetite
 
         //---OVERSEERS---
 
-        private Color overseerColor = new Color(0.7f, 0.6f, 0.5f);
+        private Color overseerColor = new Color(0.4f, 0.3f, 0.2f);
         private Color overseerMyceliumColor = new Color(0.9f, 0.44f, 0f);
         private void hook_OverseerGraphics_ctor(On.OverseerGraphics.orig_ctor orig, OverseerGraphics self, PhysicalObject ow)
         {
