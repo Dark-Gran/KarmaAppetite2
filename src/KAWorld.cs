@@ -31,6 +31,9 @@ namespace KarmaAppetite
 
         public void KAWorld_Hooks()
         {
+            //General
+            On.RainWorldGame.SpawnPlayers_int_WorldCoordinate += hook_RainWorldGame_SpawnPlayers_A;
+            On.RainWorldGame.SpawnPlayers_bool_bool_bool_bool_WorldCoordinate += hook_RainWorldGame_SpawnPlayers_B;
             //Region access
             On.GateKarmaGlyph.ctor += hook_GateKarmaGlyph_ctor;
             On.RegionGate.customKarmaGateRequirements += hook_RegionGate_customKarmaGateRequirements;
@@ -58,6 +61,31 @@ namespace KarmaAppetite
 
 
         //------IMPLEMENTATION------
+
+
+        //---GENERAL---
+
+        //Starting position
+        private AbstractCreature hook_RainWorldGame_SpawnPlayers_A(On.RainWorldGame.orig_SpawnPlayers_int_WorldCoordinate orig, RainWorldGame self, int count, WorldCoordinate location)
+        {
+            if (self.world.GetAbstractRoom(location.room).name == "SX_F01")
+            {
+                location.x = 5;
+                location.y = 110;
+            }
+            return orig.Invoke(self, count, location);
+        }
+
+        private AbstractCreature hook_RainWorldGame_SpawnPlayers_B(On.RainWorldGame.orig_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate orig, RainWorldGame self, bool player1, bool player2, bool player3, bool player4, WorldCoordinate location)
+        {
+            if (self.world.GetAbstractRoom(location.room).name == "SX_F01")
+            {
+                location.x = 5;
+                location.y = 110;
+            }
+            return orig.Invoke(self, player1, player2, player3, player4, location);
+        }
+
 
         //---OE+LC REGIONS ACCESS---
 
