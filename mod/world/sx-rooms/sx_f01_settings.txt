@@ -2,5 +2,5 @@ Template: SX_SettingsTemplate_Superstructure
 BkgDroneVolume: 0.326087
 RandomItemDensity: 0.4782609
 RandomItemSpearChance: 0.2173913
-Effects: SSSwarmers-0-29.24896-148, ZeroG-0.5-30-30, Flies-0.0326087-200-181, ProjectedScanLines-0-21-101, 
+Effects: SSSwarmers-0-29.24896-148, ZeroG-0.8043478-30-30, Flies-0.0326087-200-181, ProjectedScanLines-0-21-101, 
 FadePalette: 2, 0.7039855, 0.7039852, 0.7085823, 0.705446, 0.7039855, 0.7039858
