@@ -324,8 +324,8 @@ namespace KarmaAppetite
         {
             orig.Invoke(self, saveStateNumber, game);
             KarmaToFood(self.characterStats, self.saveState.deathPersistentSaveData.karma);
-            FoodToStats(self.characterStats, self.saveState.food, null, self.saveState.deathPersistentSaveData.karma >= 9); //Note: missing SwallowedVoidPearl check - ok because refresh after load? THEREFORE Deprecated? Needs a test.
-            self.saveState.theGlow = ShouldGlow(self.saveState.deathPersistentSaveData.karma, self.saveState.food); //Same as the line above (= missing check: deprecated?)
+            FoodToStats(self.characterStats, self.saveState.food, null, self.saveState.deathPersistentSaveData.karma >= 9); //Missing v-pearl check
+            self.saveState.theGlow = ShouldGlow(self.saveState.deathPersistentSaveData.karma, self.saveState.food); //Missing v-pearl check
         }
 
         private void RefreshAllPlayers(StoryGameSession session)

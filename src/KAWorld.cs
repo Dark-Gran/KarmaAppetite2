@@ -5,6 +5,7 @@ using On;
 using RWCustom;
 using MoreSlugcats;
 using static KarmaAppetite.KABase;
+using IL;
 
 
 namespace KarmaAppetite
@@ -19,6 +20,7 @@ namespace KarmaAppetite
             //General
             On.RainWorldGame.SpawnPlayers_int_WorldCoordinate += hook_RainWorldGame_SpawnPlayers_A;
             On.RainWorldGame.SpawnPlayers_bool_bool_bool_bool_WorldCoordinate += hook_RainWorldGame_SpawnPlayers_B;
+            On.Player.ctor += hook_Player_ctor;
             //Region access
             On.GateKarmaGlyph.ctor += hook_GateKarmaGlyph_ctor;
             On.RegionGate.customKarmaGateRequirements += hook_RegionGate_customKarmaGateRequirements;
@@ -53,7 +55,7 @@ namespace KarmaAppetite
         //Starting position
         private AbstractCreature hook_RainWorldGame_SpawnPlayers_A(On.RainWorldGame.orig_SpawnPlayers_int_WorldCoordinate orig, RainWorldGame self, int count, WorldCoordinate location)
         {
-            if (self.world.GetAbstractRoom(location.room).name == "SX_F01")
+            if (self.world.GetAbstractRoom(location.room).name == "SZ_F01")
             {
                 location.x = 5;
                 location.y = 110;
@@ -63,12 +65,23 @@ namespace KarmaAppetite
 
         private AbstractCreature hook_RainWorldGame_SpawnPlayers_B(On.RainWorldGame.orig_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate orig, RainWorldGame self, bool player1, bool player2, bool player3, bool player4, WorldCoordinate location)
         {
-            if (self.world.GetAbstractRoom(location.room).name == "SX_F01")
+            if (self.world.GetAbstractRoom(location.room).name == "SZ_F01")
             {
                 location.x = 5;
                 location.y = 110;
             }
             return orig.Invoke(self, player1, player2, player3, player4, location);
+        }
+
+        //Starting pearl (TCoS Pearl)
+        private void hook_Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
+        {
+            orig.Invoke(self, abstractCreature, world);
+            if (self.slugcatStats.name == KABase.Pathfinder)
+            {
+                AbstractPhysicalObject apo = new DataPearl.AbstractDataPearl(world, AbstractPhysicalObject.AbstractObjectType.DataPearl, null, self.abstractCreature.pos, world.game.GetNewID(), -1, -1, null, KABase.KarmaAppetiteEnums.KAType.TCoSPearl);
+                self.objectInStomach = apo;
+            }
         }
 
 
@@ -183,9 +196,9 @@ namespace KarmaAppetite
         private void hook_CoralBrain_Mycelium_UpdateColor(On.CoralBrain.Mycelium.orig_UpdateColor orig, CoralBrain.Mycelium self, Color newColor, float gradientStart, int spr, RoomCamera.SpriteLeaser sLeaser)
         {
             orig.Invoke(self, newColor, gradientStart, spr, sLeaser);
-            bool inSX = self.owner.OwnerRoom.abstractRoom.subregionName == "Solemn Quarry" || self.owner.OwnerRoom.abstractRoom.subregionName == "Two Colors of Smoke";
+            bool inSZ = self.owner.OwnerRoom.abstractRoom.subregionName == "Solemn Quarry" || self.owner.OwnerRoom.abstractRoom.subregionName == "Two Colors of Smoke";
             bool isOverseer = self.owner is OverseerGraphics && (self.owner as OverseerGraphics).overseer.abstractCreature.abstractAI is OverseerAbstractAI;
-            if ((inSX && !isOverseer) || (isOverseer && ((self.owner as OverseerGraphics).overseer.abstractCreature.abstractAI as OverseerAbstractAI).ownerIterator == 6))
+            if ((inSZ && !isOverseer) || (isOverseer && ((self.owner as OverseerGraphics).overseer.abstractCreature.abstractAI as OverseerAbstractAI).ownerIterator == 6))
             {
                 self.color = overseerColor;
                 for (int j = 1; j < 3; j++)
@@ -207,7 +220,7 @@ namespace KarmaAppetite
         private void hook_WorldLoader_GeneratePopulation(On.WorldLoader.orig_GeneratePopulation orig, WorldLoader self, bool fresh)
         {
             orig.Invoke(self, fresh);
-            if (self.world.region.name == "SX")
+            if (self.world.region.name == "SZ")
             {
                 int num2 = UnityEngine.Random.Range(self.world.region.regionParams.overseersMin, self.world.region.regionParams.overseersMax);
                 for (int num3 = 0; num3 < num2; num3++)
@@ -222,7 +235,7 @@ namespace KarmaAppetite
         {
             if (self.world.game.Players.Count > 0 && self.RelevantPlayer != null)
             {
-                if (self.RelevantPlayer.Room.name == "SX_D01" && !self.goToPlayer && !self.playerGuide)
+                if (self.RelevantPlayer.Room.name == "SZ_D01" && !self.goToPlayer && !self.playerGuide)
                 {
                     self.goToPlayer = true;
                     if (ModManager.MMF)
@@ -249,7 +262,7 @@ namespace KarmaAppetite
                 //{
                     list = new List<string>
                     {
-                        "SX",
+                        "SZ",
                         "LF",
                         "SB",
                         "SI",
@@ -270,7 +283,7 @@ namespace KarmaAppetite
                 {
                     list = new List<string>
                     {
-                        "SX",
+                        "SZ",
                         "RM",
                         "UW",
                         "CC",
@@ -294,9 +307,9 @@ namespace KarmaAppetite
         private string hook_OWAI_DirectionFinder_StoryRoomInRegion(On.OverseersWorldAI.DirectionFinder.orig_StoryRoomInRegion orig, OverseersWorldAI.DirectionFinder self, string currentRegion, bool metMoon)
         {
             string orig_result = orig.Invoke(self, currentRegion, metMoon);
-            if (currentRegion == "SX")
+            if (currentRegion == "SZ")
             {
-                return "SX_D01";
+                return "SZ_D01";
             }
             else if (currentRegion == "RM")
             {
