@@ -1,5 +1,0 @@
-Template: SX_SettingsTemplate_Superstructure
-BkgDroneVolume: 0
-Effects: ZeroG-0-269-74, SSSwarmers-0-30-30, Flies-0-40-40, 
-FadePalette: 2, 0.6086956, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217, 0.7065217
-WetTerrain: OFF

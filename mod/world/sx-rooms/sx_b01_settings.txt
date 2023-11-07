@@ -1,6 +1,0 @@
-WaveSpeed: 0.5
-Grime: 0.3586957
-BkgDroneVolume: 0.2769565
-EffectColorA: 13
-EffectColorB: 13
-FadePalette: 2, 0.7065217, 0.7065217

@@ -1,2 +1,0 @@
-[ADD]GATE_SX_SU : 1 : 1
-[ADD]GATE_SX_SB : 5 : 5
