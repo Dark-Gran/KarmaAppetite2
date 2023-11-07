@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using BepInEx;
-using MonoMod.RuntimeDetour;
-using MonoMod;
 using On;
 using RWCustom;
 using UnityEngine;
-using SlugBase.Features;
 using MoreSlugcats;
 
 namespace KarmaAppetite

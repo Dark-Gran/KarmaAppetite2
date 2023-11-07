@@ -1,24 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using BepInEx;
-using MonoMod.RuntimeDetour;
-using MonoMod;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using On;
-using IL;
-using DevInterface;
 using RWCustom;
-using HUD;
-using SlugBase.Features;
 using MoreSlugcats;
-using SlugBase;
-using SlugBase.DataTypes;
 using static KarmaAppetite.KABase;
 
 
