@@ -2,10 +2,6 @@
 	"id": "Intro_Pathfinder",
 	"slideshow_folder": "scenes/intro - pathfinder",
 	"next_process": "Game",
-	"music": {
-		"name": "RW_Intro_Theme",
-		"fade_in": 40
-	},
 	"scenes": [
 		{
 			"name": "scene1",
