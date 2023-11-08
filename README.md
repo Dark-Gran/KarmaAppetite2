@@ -80,8 +80,8 @@ Creature + Jellyfish => Killed creature
   
 - Some images lack a flatmode version, others exist in flatmode only.  
 - Region is rather a mini-region: needs more rooms.  
-- Finishing the game without finishing the quest has been cut for now.  
-- Player guide needs upgrade.  
+- Special outro for finishing the game without completing the quest has been cut for now.  
+- Player guide needs upgrade of its capabilities.  
 - Iterator deserves a prettier halo and a conversation upgrade (eg. comment on delivering more quest items after finishing already).  
 - Region music has been cut. (inspiration: [Ghost Cop - Just run](https://www.youtube.com/watch?v=uJRGnA-dSQw))  
   
