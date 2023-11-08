@@ -13,7 +13,7 @@ Installation:
    - KA_SolemnQuarry (region mod - can be used separately, however the Iterator won't be present)  
    - KA_IteratorKit (addition for the region)  
    - SlugBase (dependency)  
-- Make sure all four mods are enabled in the Remix menu in game.  
+- Make sure all four mods are enabled in the Remix menu in game. (Config menu with cheats available)  
   
   
 _If you want to learn about everything I do, I'll be happy if you [follow me on my humble Twitter](https://twitter.com/DarkGran_CZ)._  
