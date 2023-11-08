@@ -78,7 +78,7 @@ Creature + Jellyfish => Killed creature
   
 ## Known Issues & TODO list  
   
-- Some images lack flatmode version, others exist in flatmode only.  
+- Some images lack a flatmode version, others exist in flatmode only.  
 - Region is rather a mini-region: needs more rooms.  
 - Finishing the game without finishing the quest has been cut for now.  
 - Player guide needs upgrade.  
