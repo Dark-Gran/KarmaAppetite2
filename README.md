@@ -16,12 +16,7 @@ Installation:
 - Make sure all four mods are enabled in the Remix menu in game. (Config menu with cheats available)  
   
 Unlike in [previous version](https://github.com/Dark-Gran/KarmaAppetite), there is no ExtraInventory mod.  
-But if your slugcat really needs a backpack, I can recommend [LeeMoriya's Inventory Mod](https://github.com/LeeMoriya/Inventory).  
-  
-_If you want to learn about everything I do, I'll be happy if you [follow me on my humble Twitter](https://twitter.com/DarkGran_CZ)._  
-  
-_You can also [contact me on Discord](https://discordapp.com/users/darkgran) with questions and/or issues._  
-  
+**But if your slugcat really needs a backpack, I can recommend [LeeMoriya's Inventory Mod](https://github.com/LeeMoriya/Inventory).**  
   
 ## Description  
   
@@ -50,7 +45,7 @@ _You may want to find out about Pathfinder's potential in game._
   **Max food, Karma 1-3**: +- Survivor  
   **Max food, Karma 5**: Glowing Hunter with a multiplied damage on spear.  
   **Max food, Karma 10**: Dances with Martyr. (on Karma 10, all bonuses are doubled)  
-  Note: Karma 7 removes all food prices.
+  Note: Karma 7 removes all food prices.  
   Note: Final quest item provides Karma10 bonuses plus something extra.
 </details>
 
@@ -93,12 +88,15 @@ Creature + Jellyfish => Killed creature
 ## Acknowledgements  
   
 This mod uses [SlugBase](https://github.com/SlimeCubed/SlugBase) for slugcat's basic framework.  
-Special thanks go to [IteratorKit](https://github.com/Twofour2/IteratorKit) for enabling the regions Iterator.  
+Special thanks go to [IteratorKit](https://github.com/Twofour2/IteratorKit) for enabling the regions Iterator!  
   
 ## Source Code  
   
 The code of all modules is open-source. Main code is in this repository, however the region and the forked IteratorKit are separated:  
-Git Links:  
 [KarmaAppetite_SolemnQuarry](https://github.com/Dark-Gran/KarmaAppetite-SolemnQuarry)  
 [KarmaAppetite_IteratorKit](https://github.com/Dark-Gran/KarmaAppetite-IteratorKit)  
   
+## Contact  
+  
+_If you want to learn about everything I do, I'll be happy if you [follow me on my humble Twitter](https://twitter.com/DarkGran_CZ)._  
+_You can also [contact me on Discord](https://discordapp.com/users/darkgran) with questions and/or issues._  
