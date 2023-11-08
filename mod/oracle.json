@@ -8,7 +8,7 @@
     "annoyedScore": 10,
     "angryScore": 0,
     "talkHeight": 0,
-    "pearlFallback": "moon",
+    "pearlFallback": "pebbles",
     "cornerPositions": [
       {
         "x": 7,
@@ -76,41 +76,82 @@
       "generic": [
         {
           "event": "playerEnterNeverMet",
-          "hold": 5,
-          "wait": 5,
-          "texts": [ "Hello <PlayerName>.", "Here is some substance." ],
+          "hold": 10,
+          "wait": 10,
+          "texts": [
+            "Ah, welcome, acolyte."
+          ]
+        },
+        {
+          "event": "playerEnterNeverMet",
+          "hold": 25,
+          "wait": 25,
+          "texts": [
+            "I can already feel your --HATE-- ...no, anxiety. <LINE>Are you prepared to break the cycle of --MADNESS-- repetition?",
+            "All I need you to do is go to an old... acquaitance of mine. <LINE>Go into the heart of corruption and bring me what you can find.",
+            "--KILL HIM-- No, do not trouble yourself with the sick one. He is... beyond redemption.",
+            "I need pieces of his knowledge. Two should be just enough. You will find those at the very core.",
+            "I also gave you a message for a friend. In case you were to meet her."
+          ]
+        },
+        {
+          "event": "playerEnterNeverMet",
+          "hold": 25,
+          "wait": 25,
+          "texts": [
+            "--SAVE HER!-- No, that is unnecessary. She has been saved already. Focus on priorities. <LINE>Bring me what I need and I will free us all."
+          ]
+        },
+        {
+          "event": "playerEnterNeverMet",
+          "hold": 17,
+          "wait": 17,
+          "texts": [ "I am giving you some substance to make your journey easier." ],
           "action": "giveFood"
         },
         {
           "event": "playerEnterNeverMet",
-          "hold": 5,
-          "wait": 5,
-          "texts": [ "This was our FIRST dialog." ],
+          "hold": 15,
+          "wait": 15,
+          "texts": [ "--NOW GO!-- Let us not waste time." ]
+        },
+        {
+          "event": "playerEnterNeverMet",
+          "hold": 15,
+          "wait": 15,
+          "texts": [ "Good luck, acolyte." ],
           "action": "saveMetCM"
         },
         {
           "event": "playerEnter",
-          "hold": 5,
-          "wait": 5,
-          "texts": [ "Hello <PlayerName>.", "This is our SECOND dialog." ]
+          "hold": 15,
+          "wait": 15,
+          "texts": [ "Welcome back, acolyte.", "Have you brought me what I require?" ]
         },
         {
           "event": "addedCorruptionPearl",
-          "hold": 5,
-          "wait": 5,
-          "texts": [ "Yes, that's one." ]
+          "hold": 25,
+          "wait": 25,
+          "texts": [ "Excellent! You're quite a --TOMB RAIDER-- ...I mean, trailblazer.", "But a single one is not enough. I need... --MORE--" ]
         },
         {
           "event": "finishedCorruptionPearls",
-          "hold": 5,
-          "wait": 5,
-          "texts": [ "Now there's two, here is the result." ]
+          "hold": 25,
+          "wait": 25,
+          "texts": [
+            "Such a wayfarer! Let us harvest the fruits of your labor...",
+            "Consume this pearl and find the Great Sea Below. <LINE>You must travel deep, deep underground. --SACRILEGE!-- And free yourself of desires.",
+            "Remember: Surrender becomes power. <LINE>I'm sure you will find a way.",
+            "If everything went right... we will all be freed of this repetition. --SCREECH--",
+            "Safe journey, acolyte."
+          ],
+          "action": "giveMaxKarma"
         }
       ],
       "pearls": [
         {
           "item": "Misc",
-          "texts": [ "This is where the white pearl dialogs go." ]
+          "texts": [ "Unimportant data. This is not what I asked for." ]
         }
       ]
     }
