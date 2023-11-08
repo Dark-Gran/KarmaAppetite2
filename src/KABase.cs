@@ -240,39 +240,21 @@ namespace KarmaAppetite
 
         private static void RefreshGlow(Player self)
         {
-            bool glowing = ShouldGlow(self.Karma, self.CurrentFood, self);
-            if (self.glowing != glowing)
+            if (self != null && self.State != null)
             {
-                self.glowing = glowing;
-                (self.State as PlayerNPCState).Glowing = true;
-                if (self.room != null)
+                bool glowing = ShouldGlow(self.Karma, self.CurrentFood, self);
+                if (self.glowing != glowing)
                 {
-                    if (self.room.game.session is StoryGameSession)
+                    self.glowing = glowing;
+                    (self.State as PlayerNPCState).Glowing = true;
+                    if (self.room != null)
                     {
-                        (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
+                        if (self.room.game.session is StoryGameSession)
+                        {
+                            (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
+                        }
                     }
                 }
-
-                /*
-                if (self.graphicsModule != null && self.graphicsModule is PlayerGraphics)
-                {
-                    PlayerGraphics pg = self.graphicsModule as PlayerGraphics;
-                    if (!glowing)
-                    {
-                        ((PlayerGraphics)self.graphicsModule).lightSource.Destroy();
-                    }
-                    else if (pg.lightSource == null){
-                        pg.lightSource = new LightSource(self.mainBodyChunk.pos, false, new Color(1f, 1f, 1f), self);
-                        pg.lightSource.requireUpKeep = true;
-                        pg.lightSource.submersible = true;
-                        pg.lightSource.setRad = new float?(300f);
-                        pg.lightSource.setAlpha = new float?(1f);
-                        self.room.AddObject(pg.lightSource);
-                    }
-                    
-                }
-                */
-
             }
         }
 
