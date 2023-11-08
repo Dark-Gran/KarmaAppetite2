@@ -15,7 +15,7 @@ Installation:
    - SlugBase (dependency)  
 - Make sure all four mods are enabled in the Remix menu in game. (Config menu with cheats available)  
   
-Unlike in [previous version](https://github.com/Dark-Gran/KarmaAppetite), there is no ExtraInventory mod.  
+Unlike in the [previous version](https://github.com/Dark-Gran/KarmaAppetite), there is no ExtraInventory mod.  
 **But if your slugcat really needs a backpack, I can recommend [LeeMoriya's Inventory Mod](https://github.com/LeeMoriya/Inventory).**  
   
 ## Description  
