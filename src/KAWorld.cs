@@ -411,26 +411,37 @@ namespace KarmaAppetite
             orig.Invoke(self);
             if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_TCoS)
             {
-                self.PearlIntro();
                 self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
-                    "...TCoS Pearl text"
-                    ), 100));
+                    "A pearl? You want me to read this?"
+                    ), 60));
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "It's a message... for me."
+                    ), 50));
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "'My dearest Moon, I speak to the Sun often, but I only think of You. <LINE>Your songs are heard, Your shine is bright, unlike ours. <LINE>That is why I send this letter. I'm glad You shine more with each night, I'm glad you feel better. <LINE>If everything goes right... we will meet each other among the stars. - TCoS'"
+                    ), 220));
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "..."
+                    ), 20));
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "I'll have to think about my response. Good friend. Troubled spirit. I hope he's careful in his endeavors."
+                    ), 120));
                 return;
             }
             if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_Corruption)
             {
                 self.PearlIntro();
                 self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
-                    "... [Corruption Pearl text]"
-                    ), 100));
+                    "Oh. Did you get this from Five Pebbles? You should have left it there. <LINE>It's a sign of his sickness, and can be dangerous. It is best not to examine it."
+                    ), 160));
                 return;
             }
             if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_Void)
             {
                 self.PearlIntro();
                 self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
-                    "... [Void Pearl text]"
-                    ), 100));
+                    "This one contains instructions for a weapon, or a bomb, utilizing the void fluid. <LINE>But it does not contain any schematics, except for a trigger. Where did you get this? You'd better be careful with it."
+                    ), 160));
                 return;
             }
         }
