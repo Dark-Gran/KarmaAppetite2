@@ -231,7 +231,7 @@ namespace KarmaAppetite
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
             for (int j = 0; j < self.totalSprites; j++)
             {
-                sLeaser.sprites[self.firstSprite + j].color = overseerColor;
+                sLeaser.sprites[self.firstSprite + j].color = overseerMyceliumColor;
             }
         }
 
