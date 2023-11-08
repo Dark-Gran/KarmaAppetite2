@@ -13,9 +13,10 @@ Installation:
    - KA_SolemnQuarry (region mod - can be used separately, however the Iterator won't be present)  
    - KA_IteratorKit (addition for the region)  
    - SlugBase (dependency)  
-- Make sure all four mods are enabled in the Remix menu in game. (Config menu with cheats available)
-
-Inventory mod has been cut, however if your slugcat really needs a backpack, I can recommend [LeeMoriya's Inventory Mod](https://github.com/LeeMoriya/Inventory).
+- Make sure all four mods are enabled in the Remix menu in game. (Config menu with cheats available)  
+  
+Unlike in [previous version](https://github.com/Dark-Gran/KarmaAppetite), there is no ExtraInventory mod.  
+But if your slugcat really needs a backpack, I can recommend [LeeMoriya's Inventory Mod](https://github.com/LeeMoriya/Inventory).  
   
 _If you want to learn about everything I do, I'll be happy if you [follow me on my humble Twitter](https://twitter.com/DarkGran_CZ)._  
   
