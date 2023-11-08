@@ -3,7 +3,7 @@
 	"name": "KA - Karma Appetite",
 	"version": "2.0",
 	"authors": "DarkGran",
-	"description": "...",
+	"description": "Meet Pathfinder, a witty slugcat with a Karma:Food:Stats progression system, crafting skills, and an ability to move around using tunnels.\nHold Q for crafting, hold E and direction for tunneling.",
 	"requirements": [ "slime-cubed.slugbase" ],
 	"requirements_names": [ "SlugBase" ],
 	"tags": [ "Custom Slugcat", "Custom Region" ],
