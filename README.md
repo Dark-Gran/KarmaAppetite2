@@ -31,6 +31,8 @@ A witty slugcat with a progressive Karma:Food:Stats system. Also able to craft t
 - **Karma/Food/Stats scaling:** Higher Karma translates to higher food requirement. However the more food slugcat eats, the stronger it becomes! Affects things like speed, spear power, and lung capacity.  
 - **Crafting:** Holding Q while stationary combines - or dismantles - held items. If nothing is held, it will find (create) a piece of rock. See the crafting recipes below.
 - **Tunneling:** Holding E will move the slugcat through a temporary shortcut. It provides only a partial invulnerability, so be careful what you tunnel through!  
+
+  ![alt text](preview_craft.gif)  ![alt text](preview_tunnel.gif)
   
 ### Crafting recipes   
 
