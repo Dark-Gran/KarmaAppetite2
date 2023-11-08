@@ -6,7 +6,7 @@ using RWCustom;
 using MoreSlugcats;
 using static KarmaAppetite.KABase;
 using IL;
-
+using System.IO;
 
 namespace KarmaAppetite
 {
@@ -59,6 +59,7 @@ namespace KarmaAppetite
             {
                 location.x = 5;
                 location.y = 110;
+                DeleteMetCM();
             }
             return orig.Invoke(self, count, location);
         }
@@ -69,8 +70,25 @@ namespace KarmaAppetite
             {
                 location.x = 5;
                 location.y = 110;
+                DeleteMetCM();
             }
             return orig.Invoke(self, player1, player2, player3, player4, location);
+        }
+
+        private void DeleteMetCM()
+        {
+            string saveFilePath = string.Concat(new object[]
+            {
+                Custom.RootFolderDirectory(),
+                Path.DirectorySeparatorChar,
+                "metCM",
+                ".txt"
+            });
+
+            if (File.Exists(saveFilePath))
+            {
+                File.Delete(saveFilePath);
+            }
         }
 
         //Starting pearl (TCoS Pearl)
