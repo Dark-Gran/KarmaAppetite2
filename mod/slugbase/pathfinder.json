@@ -1,7 +1,7 @@
 {
 	"id": "Pathfinder",
 	"name": "The Pathfinder",
-	"description": "A witty slugcat with a karma-based metabolism. Able to craft tools, or even make shortcuts of its own.<LINE>(Hold Q to craft. Hold E + direction to tunnel.)",
+	"description": "A witty slugcat with a karma-based metabolism. Able to craft tools, and even make shortcuts of its own.<LINE>(Hold Q to craft. Hold E + direction to tunnel.)",
 	"features": {
 		"color": "d6650f",
 
@@ -16,7 +16,7 @@
 		"karma_cap": 6,
 		"the_mark": true,
 		"the_glow": false,
-		"start_room": "SL_AI",
+		"start_room": "SZ_D01",
 		"guide_overseer": 6,
 		"has_dreams": true,
 		"use_default_dreams": false,
