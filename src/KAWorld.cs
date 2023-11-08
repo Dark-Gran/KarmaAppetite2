@@ -370,6 +370,10 @@ namespace KarmaAppetite
         private Color? hook_DataPearl_UniquePearlHighLightColor(On.DataPearl.orig_UniquePearlHighLightColor orig, DataPearl.AbstractDataPearl.DataPearlType pearlType)
         {
             Color? orig_result = orig.Invoke(pearlType);
+            if (pearlType == KarmaAppetiteEnums.KAType.TCoSPearl)
+            {
+                return new Color(1.0f, 0.7f, 0.2f);
+            }
             if (pearlType == KarmaAppetiteEnums.KAType.CorruptionPearl)
             {
                 return new Color(0.043f, 0.318f, 1f);
@@ -384,6 +388,7 @@ namespace KarmaAppetite
         //Conversations
         private void hook_SLOracleBehaviorHasMark_GrabObject(On.SLOracleBehaviorHasMark.orig_GrabObject orig, SLOracleBehaviorHasMark self, PhysicalObject item)
         {
+            orig.Invoke(self, item);
             if (item is DataPearl)
             {
                 if ((item as DataPearl).AbstractPearl.dataPearlType == KarmaAppetiteEnums.KAType.TCoSPearl)
@@ -399,7 +404,6 @@ namespace KarmaAppetite
                     self.currentConversation = new SLOracleBehaviorHasMark.MoonConversation(KarmaAppetiteEnums.KAType.Moon_Pearl_Void, self, SLOracleBehaviorHasMark.MiscItemType.NA);
                 }
             }
-            orig.Invoke(self, item);
         }
 
         private void hook_MoonConversation_AddEvents(On.SLOracleBehaviorHasMark.MoonConversation.orig_AddEvents orig, SLOracleBehaviorHasMark.MoonConversation self)
@@ -409,8 +413,8 @@ namespace KarmaAppetite
             {
                 self.PearlIntro();
                 self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
-                    "... [TCoS Pearl text]"
-                    ), 10));
+                    "...TCoS Pearl text"
+                    ), 100));
                 return;
             }
             if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_Corruption)
@@ -418,7 +422,7 @@ namespace KarmaAppetite
                 self.PearlIntro();
                 self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
                     "... [Corruption Pearl text]"
-                    ), 10));
+                    ), 100));
                 return;
             }
             if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_Void)
@@ -426,7 +430,7 @@ namespace KarmaAppetite
                 self.PearlIntro();
                 self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
                     "... [Void Pearl text]"
-                    ), 10));
+                    ), 100));
                 return;
             }
         }
