@@ -79,7 +79,7 @@ Creature + Jellyfish => Killed creature
 ## Known Issues & TODO list  
   
 - Some images lack a flatmode version, others exist in flatmode only.  
-- Region is rather a mini-region: needs more rooms.  
+- Region is rather a mini-region: needs more rooms (draft on paper).  
 - Special outro for finishing the game without completing the quest has been cut for now.  
 - Player guide needs upgrade of its capabilities.  
 - Iterator deserves a prettier halo and a conversation upgrade (eg. comment on delivering more quest items after finishing already).  
