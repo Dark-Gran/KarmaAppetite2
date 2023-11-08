@@ -1,7 +1,7 @@
 {
 	"id": "Pathfinder",
 	"name": "The Pathfinder",
-	"description": "...<LINE>...",
+	"description": "A witty slugcat with a karma-based metabolism. Able to craft it's own tools, or even make shortcuts of its own.<LINE>(Hold Q to craft. Hold E + direction to tunnel.)",
 	"features": {
 		"color": "d6650f",
 
