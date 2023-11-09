@@ -106,4 +106,4 @@ The code of all modules is open-source. Main code is in this repository, however
   
 ## Contact  
   
-_You can also [contact me on Discord](https://discordapp.com/users/darkgran) with questions and/or issues._  
+_[Contact me on Discord](https://discordapp.com/users/darkgran) with questions and/or issues._  
