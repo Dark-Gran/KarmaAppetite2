@@ -22,10 +22,12 @@ Unlike in the [previous version](https://github.com/Dark-Gran/KarmaAppetite), th
   
 A witty slugcat with a progressive Karma:Food:Stats system. Also able to craft tools, and even make shortcuts of its own.  
   
+_Applies to all slugcats, however only the Pathfinder gets the "true campaign experience"._
+  
 **Controls:** Hold Q to craft. Hold E + direction to tunnel. (tapping the direction is enough, no need to hold)  
   
 ### Features  
-- **Karma/Food/Stats scaling:** Higher Karma translates to higher food requirement. However the more food slugcat eats, the stronger it becomes! Affects things like speed, spear power, and lung capacity.  
+- **Karma/Food/Stats scaling:** Higher Karma translates to higher food requirement. However the more food slugcat eats, the stronger it becomes! Affects things like speed, spear power, and lung capacity. Applies to all slugcats.  
 - **New Campaign:** New mini-region and new iterator with a new quest! Includes custom pearls. Best played with The Pathfinder.  
 - **Crafting:** Holding Q while stationary combines held items. If nothing is held, it will find (create) a piece of rock. Items can also be dismantled (eg. breaking spear in half, or food from a lantern). See the crafting recipes below. 
 - **Tunneling:** Holding E will move the slugcat through a temporary shortcut. It provides only a partial invulnerability, so be careful what you tunnel through!  
