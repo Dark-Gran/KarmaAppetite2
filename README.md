@@ -18,6 +18,11 @@ Installation:
 Unlike in the [previous version](https://github.com/Dark-Gran/KarmaAppetite), there is no ExtraInventory mod.  
 **But if your slugcat really needs a backpack, I can recommend [LeeMoriya's Inventory Mod](https://github.com/LeeMoriya/Inventory).**  
   
+**Steam Links:**  
+[KA_KarmaAppetite](https://steamcommunity.com/sharedfiles/filedetails/?id=3077237509)  
+[KA_IteratorKit](https://steamcommunity.com/sharedfiles/filedetails/?id=3077237785)  
+[KA_SolemnQuarry](https://steamcommunity.com/sharedfiles/filedetails/?id=3077239556)  
+  
 ## Description  
   
 A witty slugcat with a progressive Karma:Food:Stats system. Also able to craft tools, and even make shortcuts of its own.  
