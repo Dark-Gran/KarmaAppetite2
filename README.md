@@ -4,7 +4,7 @@
   
 This is a game mod for Rain World: Downpour v1.9 (DLC required).  
   
-[RELEASE DOWNLOAD](https://github.com/Dark-Gran/KarmaAppetite2/releases/download/2.0/KarmaAppetite2.rar)  
+[**RELEASE DOWNLOAD**](https://github.com/Dark-Gran/KarmaAppetite2/releases/download/2.0/KarmaAppetite2.rar)  
   
 Installation:  
 - Download KarmaAppetite2.rar and extract it into the "mods" folder.  
@@ -17,6 +17,12 @@ Installation:
   
 Unlike in the [previous version](https://github.com/Dark-Gran/KarmaAppetite), there is no ExtraInventory mod.  
 **But if your slugcat really needs a backpack, I can recommend [LeeMoriya's Inventory Mod](https://github.com/LeeMoriya/Inventory).**  
+  
+**Steam Links:**  
+[KA_KarmaAppetite](https://steamcommunity.com/sharedfiles/filedetails/?id=3077237509)  
+[KA_IteratorKit](https://steamcommunity.com/sharedfiles/filedetails/?id=3077237785)  
+[KA_SolemnQuarry](https://steamcommunity.com/sharedfiles/filedetails/?id=3077239556)  
+[SlugBase](https://steamcommunity.com/sharedfiles/filedetails/?id=2933196558)  
   
 ## Description  
   
@@ -100,5 +106,4 @@ The code of all modules is open-source. Main code is in this repository, however
   
 ## Contact  
   
-_If you want to learn about everything I do, I'll be happy if you [follow me on my humble Twitter](https://twitter.com/DarkGran_CZ)._  
-_You can also [contact me on Discord](https://discordapp.com/users/darkgran) with questions and/or issues._  
+_[Contact me on Discord](https://discordapp.com/users/darkgran) with questions and/or issues._  
