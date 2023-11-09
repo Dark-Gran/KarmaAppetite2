@@ -249,7 +249,7 @@ namespace KarmaAppetite
                     (self.State as PlayerNPCState).Glowing = true;
                     if (self.room != null)
                     {
-                        if (self.room.game.session is StoryGameSession)
+                        if (self.room != null && self.room.game.session is StoryGameSession)
                         {
                             (self.room.game.session as StoryGameSession).saveState.theGlow = glowing;
                         }
