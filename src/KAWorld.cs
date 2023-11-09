@@ -95,7 +95,7 @@ namespace KarmaAppetite
         private void hook_Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig.Invoke(self, abstractCreature, world);
-            if (self.slugcatStats.name == KABase.Pathfinder && self.room.abstractRoom.name == "SZ_F01")
+            if (self.room.abstractRoom.name == "SZ_F01" && self.slugcatStats.name == KABase.Pathfinder)
             {
                 AbstractPhysicalObject apo = new DataPearl.AbstractDataPearl(world, AbstractPhysicalObject.AbstractObjectType.DataPearl, null, self.abstractCreature.pos, world.game.GetNewID(), -1, -1, null, KABase.KarmaAppetiteEnums.KAType.TCoSPearl);
                 self.objectInStomach = apo;
@@ -164,8 +164,11 @@ namespace KarmaAppetite
         private void hook_StoryGameSession_ctor(On.StoryGameSession.orig_ctor orig, StoryGameSession self, SlugcatStats.Name saveStateNumber, RainWorldGame game)
         {
             orig.Invoke(self, saveStateNumber, game);
-            self.saveState.miscWorldSaveData.pebblesEnergyTaken = true;
-            self.saveState.miscWorldSaveData.moonHeartRestored = true;
+            if (saveStateNumber == KABase.Pathfinder)
+            {
+                self.saveState.miscWorldSaveData.pebblesEnergyTaken = true;
+                self.saveState.miscWorldSaveData.moonHeartRestored = true;
+            }
         }
 
         private void hook_RM_CORE_EnergyCell(On.MoreSlugcats.MSCRoomSpecificScript.RM_CORE_EnergyCell.orig_Update orig, MSCRoomSpecificScript.RM_CORE_EnergyCell self, bool eu)
