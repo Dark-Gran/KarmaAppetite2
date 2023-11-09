@@ -85,7 +85,7 @@ Creature + Jellyfish => Killed creature
 - Special outro for finishing the game without completing the quest has been cut for now.  
 - Player guide needs upgrade of its capabilities.  
 - Iterator deserves a prettier halo and a conversation upgrade (eg. proper pearl reading and comments on delivering more quest items after finishing already).  
-- Region music has been cut. (inspiration: [Ghost Cop - Just run](https://www.youtube.com/watch?v=uJRGnA-dSQw))  
+- Region music has been cut for now. (inspiration: [Ghost Cop - Just run](https://www.youtube.com/watch?v=uJRGnA-dSQw))  
   
 ## Acknowledgements  
   
