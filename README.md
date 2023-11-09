@@ -22,6 +22,7 @@ Unlike in the [previous version](https://github.com/Dark-Gran/KarmaAppetite), th
 [KA_KarmaAppetite](https://steamcommunity.com/sharedfiles/filedetails/?id=3077237509)  
 [KA_IteratorKit](https://steamcommunity.com/sharedfiles/filedetails/?id=3077237785)  
 [KA_SolemnQuarry](https://steamcommunity.com/sharedfiles/filedetails/?id=3077239556)  
+[SlugBase](https://steamcommunity.com/sharedfiles/filedetails/?id=2933196558)  
   
 ## Description  
   
