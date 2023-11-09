@@ -4,7 +4,7 @@
   
 This is a game mod for Rain World: Downpour v1.9 (DLC required).  
   
-[RELEASE DOWNLOAD](https://github.com/Dark-Gran/KarmaAppetite2/releases/download/2.0/KarmaAppetite2.rar)  
+[**RELEASE DOWNLOAD**](https://github.com/Dark-Gran/KarmaAppetite2/releases/download/2.0/KarmaAppetite2.rar)  
   
 Installation:  
 - Download KarmaAppetite2.rar and extract it into the "mods" folder.  
