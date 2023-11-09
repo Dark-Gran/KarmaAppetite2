@@ -95,7 +95,7 @@ namespace KarmaAppetite
         private void hook_Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig.Invoke(self, abstractCreature, world);
-            if (self.slugcatStats.name == KABase.Pathfinder)
+            if (self.slugcatStats.name == KABase.Pathfinder && self.room.abstractRoom.name == "SZ_F01")
             {
                 AbstractPhysicalObject apo = new DataPearl.AbstractDataPearl(world, AbstractPhysicalObject.AbstractObjectType.DataPearl, null, self.abstractCreature.pos, world.game.GetNewID(), -1, -1, null, KABase.KarmaAppetiteEnums.KAType.TCoSPearl);
                 self.objectInStomach = apo;
@@ -426,6 +426,9 @@ namespace KarmaAppetite
                 self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
                     "I'll have to think about my response. Good friend. Troubled spirit. I hope he's careful in his endeavors."
                     ), 120));
+                self.events.Add(new Conversation.TextEvent(self, 10, self.Translate(
+                    "Thank you for the message."
+                    ), 50));
                 return;
             }
             if (self.id == KarmaAppetiteEnums.KAType.Moon_Pearl_Corruption)
