@@ -3,7 +3,7 @@
   ![alt text](thumb.png)
   
 This is a game mod for Rain World: Downpour v1.9 (DLC required).  
-Applies to all characters.  
+_Applies to all characters._  
   
 [**RELEASE DOWNLOAD**](https://github.com/Dark-Gran/KarmaAppetite2/releases/download/2.0/KarmaAppetite2.rar)  
   
