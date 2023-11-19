@@ -9,7 +9,7 @@ _Applies to all characters._
   
 Installation:  
 - Download KarmaAppetite2.rar and extract it into the "mods" folder.  
-- Archive contains 4 mods:  
+- Archive contains 4 folder:  
    - KA_KarmaAppetite (base mod)  
    - KA_SolemnQuarry (region mod - can be used separately, however the Iterator won't be present)  
    - KA_IteratorKit (addition for the region)  
